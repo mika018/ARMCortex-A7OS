@@ -1,17 +1,19 @@
 #include "scheduler.h"
 
-pid_t next_pid = 1;
-
-pcb_t pcb[ table_size ], *current = NULL;
+// pid_t next_pid = 1;
 
 extern void     main_console();
-extern uint32_t tos_console;
-extern void     main_P3();
-extern uint32_t tos_P3;
-extern void     main_P4();
-extern uint32_t tos_P4;
-extern void     main_P5();
-extern uint32_t tos_P5;
+
+extern uint32_t tos_user;
+
+pcb_t pcb[ table_size ], *current = NULL;
+void* current_tos_user = &tos_user;
+
+void* set_user_stack( int32_t size ) {
+    void* old_tos_user = current_tos_user;
+    current_tos_user -= size;
+    return old_tos_user;
+}
 
 pid_t new_pid() {
     for(int i = 0; i < table_size; i++) {
@@ -22,20 +24,20 @@ pid_t new_pid() {
     return -1;
 }
 
-void scheduler_initialise(ctx_t* ctx) {
+void scheduler_initialise( ctx_t* ctx ) {
     memset( &pcb[ 0 ], 0, sizeof( pcb_t ) );
     pcb[ 0 ].pid       = new_pid();
-    pcb[ 0 ].ctx->cpsr = 0x50;
-    pcb[ 0 ].ctx->pc   = ( uint32_t )( &main_console );
-    pcb[ 0 ].ctx->sp   = ( uint32_t )( &tos_console  );
+    pcb[ 0 ].ctx.cpsr  = 0x50;
+    pcb[ 0 ].ctx.pc    = ( uint32_t ) ( &main_console );
+    pcb[ 0 ].ctx.sp    = ( uint32_t ) set_user_stack( 1000 );
     pcb[ 0 ].running   = 1;
 
     for (int i = 1; i < table_size - 1; i++) {
         memset( &pcb[ i ], 0, sizeof( pcb_t ) );
         pcb[ i ].pid       = 100;
-        pcb[ i ].ctx->cpsr = 0xFF;
-        pcb[ i ].ctx->pc   = 0xFF;
-        pcb[ i ].ctx->sp   = 0xFF;
+        pcb[ i ].ctx.cpsr  = 0xFF;
+        pcb[ i ].ctx.pc    = 0xFF;
+        pcb[ i ].ctx.sp    = 0xFF;
         pcb[ i ].running   = 0;
     }
 
@@ -44,36 +46,37 @@ void scheduler_initialise(ctx_t* ctx) {
 
 pcb_t next_process() {
     pid_t current_pid = current->pid;
-    for (int i = current_pid; i < 99 + current_pid; i++) {
-        int pid_next = i % 99;
-        if (pcb[ pid_next ].pid != 100) return pcb[ pid_next ];
+    for ( int i = current_pid + 1; i < table_size + current_pid; i++ ) {
+        int pid_next = i % table_size;
+        if ( pcb[ pid_next ].running ) return pcb[ pid_next ];
     }
     return *current;
 }
 
-void scheduler_run(ctx_t* ctx) {
+void scheduler_run( ctx_t* ctx ) {
     pcb_t next = next_process();
 
-    memcpy( current->ctx, ctx, sizeof( ctx_t ) );
-    memcpy( ctx, next.ctx, sizeof( ctx_t ) );
+    memcpy( &current->ctx, ctx, sizeof( ctx_t ) );
+    memcpy( ctx, &next.ctx, sizeof( ctx_t ) );
 
     current = &next;
 }
 
-/*
-pcb_t* find_pcb(pid_t pid, pcb_table* table) {
-    pcb_t* pcb = table->head;
-    for(int i = 0; i < next_pid; i++) {
-        if (pcb->pid == pid) return pcb;
-        pcb = pcb->next_pcb;
-    }
-    return NULL;
+pid_t scheduler_fork( ctx_t* ctx ) {
+    pid_t new = new_pid();
+    // if new_pid == -1 then no enough space
+    memcpy( &pcb[ new ], current, sizeof( pcb_t ));
+    // memcpy( &pcb[ new ].ctx, ctx, sizeof( ctx_t ));
+
+    pcb[ new ].pid          = new;
+    pcb[ new ].ctx.gpr[ 0 ] = 0;
+    pcb[ new ].ctx.sp       = ( uint32_t ) set_user_stack( 1000 );
+    pcb[ new ].running      = 0;
+
+    return pcb[ new ].pid;
 }
 
-void insert_pcb(ctx_t* ctx, pcb_table* table) {
-    pcb_t* pcb = new_pcb(ctx);
-    pcb->next_pcb = table->head->next_pcb;
-    table->head->next_pcb = pcb;
-}
-
- */
+void scheduler_exec( uint32_t pc ) {
+    current->ctx.pc   = pc;
+    current->running  = 1;
+} 

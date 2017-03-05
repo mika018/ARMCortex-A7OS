@@ -87,7 +87,7 @@ int  read( int fd,       void* x, size_t n ) {
 int fork() {
   int r;
 
-  asm volatile( "svc %1     \n" // make system call SYS_FORK
+  asm volatile( "svc #2     \n" // make system call SYS_FORK
                 "mov %0, r0 \n" // assign r  = r0 
               : "=r" (r) 
               : "I" (SYS_FORK)
@@ -108,7 +108,7 @@ void exit( int x ) {
 
 void exec( const void* x ) {
   asm volatile( "mov r0, %1 \n" // assign r0 = x
-                "svc %0     \n" // make system call SYS_EXEC
+                "svc #3     \n" // make system call SYS_EXEC
               :
               : "I" (SYS_EXEC), "r" (x)
               : "r0" );

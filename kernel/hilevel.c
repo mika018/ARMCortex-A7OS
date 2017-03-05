@@ -1,41 +1,31 @@
 #include "hilevel.h"
 #include "scheduler.h"
 
-/* Since we *know* there will be 3 processes, stemming from the 3 user
- * programs, we can
- *
- * - allocate a fixed-size process table (of PCBs), and use a pointer
- *   to keep track of which entry is currently executing, and
- * - employ a fixed-case of round-robin scheduling: no more processes
- *   can be created, and neither is able to complete.
- */
 
-// pcb_t pcb[ 4 ], *current = NULL;
+// void scheduler( ctx_t* ctx ) {
+//   // if      ( current == &pcb[ 0 ] ) {
+//   //   memcpy( &pcb[ 0 ].ctx, ctx, sizeof( ctx_t ) );
+//   //   memcpy( ctx, &pcb[ 1 ].ctx, sizeof( ctx_t ) );
+//   //   current = &pcb[ 1 ];
+//   // }
+//   // else if ( current == &pcb[ 1 ] ) {
+//   //   memcpy( &pcb[ 1 ].ctx, ctx, sizeof( ctx_t ) );
+//   //   memcpy( ctx, &pcb[ 2 ].ctx, sizeof( ctx_t ) );
+//   //   current = &pcb[ 2 ];
+//   // }
+//   // else if ( current == &pcb[ 2 ] ) {
+//   //   memcpy( &pcb[ 2 ].ctx, ctx, sizeof( ctx_t ) );
+//   //   memcpy( ctx, &pcb[ 3 ].ctx, sizeof( ctx_t ) );
+//   //   current = &pcb[ 3 ];
+//   // }
+//   // else if ( current == &pcb[ 3 ] ) {
+//   //   memcpy( &pcb[ 3 ].ctx, ctx, sizeof( ctx_t ) );
+//   //   memcpy( ctx, &pcb[ 0 ].ctx, sizeof( ctx_t ) );
+//   //   current = &pcb[ 0 ];
+//   // }
 
-void scheduler( ctx_t* ctx ) {
-  // if      ( current == &pcb[ 0 ] ) {
-  //   memcpy( &pcb[ 0 ].ctx, ctx, sizeof( ctx_t ) );
-  //   memcpy( ctx, &pcb[ 1 ].ctx, sizeof( ctx_t ) );
-  //   current = &pcb[ 1 ];
-  // }
-  // else if ( current == &pcb[ 1 ] ) {
-  //   memcpy( &pcb[ 1 ].ctx, ctx, sizeof( ctx_t ) );
-  //   memcpy( ctx, &pcb[ 2 ].ctx, sizeof( ctx_t ) );
-  //   current = &pcb[ 2 ];
-  // }
-  // else if ( current == &pcb[ 2 ] ) {
-  //   memcpy( &pcb[ 2 ].ctx, ctx, sizeof( ctx_t ) );
-  //   memcpy( ctx, &pcb[ 3 ].ctx, sizeof( ctx_t ) );
-  //   current = &pcb[ 3 ];
-  // }
-  // else if ( current == &pcb[ 3 ] ) {
-  //   memcpy( &pcb[ 3 ].ctx, ctx, sizeof( ctx_t ) );
-  //   memcpy( ctx, &pcb[ 0 ].ctx, sizeof( ctx_t ) );
-  //   current = &pcb[ 0 ];
-  // }
-
-  return;
-}
+//   return;
+// }
 
 void hilevel_handler_rst( ctx_t* ctx              ) {
   /* Initialise PCBs representing processes stemming from execution of
@@ -84,7 +74,7 @@ void hilevel_handler_rst( ctx_t* ctx              ) {
    * - enabling IRQ interrupts.
    */
   
-  scheduler_initialise(ctx);
+  scheduler_initialise( ctx );
 
   TIMER0->Timer1Load  = 0x00100000; // select period = 2^20 ticks ~= 1 sec
   TIMER0->Timer1Ctrl  = 0x00000002; // select 32-bit   timer
@@ -128,6 +118,16 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
       ctx->gpr[ 0 ] = n;
       break;
     }
+    case 0x02 : { // 0x02 => fork()
+      pid_t result = scheduler_fork( ctx );
+      ctx->gpr[ 0 ] = result;
+      break;
+    }
+    case 0x03 : { // 0x03 => exec( x )
+      uint32_t pc = ( uint32_t )( ctx->gpr[0] );
+      scheduler_exec( pc );
+      break;
+    }
     default   : { // 0x?? => unknown/unsupported
       break;
     }
@@ -144,7 +144,7 @@ void hilevel_handler_irq( ctx_t* ctx ) {
   // Step 4: handle the interrupt, then clear (or reset) the source.
 
   if( id == GIC_SOURCE_TIMER0 ) {
-    // scheduler( ctx );
+    scheduler_run( ctx );
     TIMER0->Timer1IntClr = 0x01;
   }
 
