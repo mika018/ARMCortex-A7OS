@@ -1,10 +1,13 @@
 #include "scheduler.h"
+#include "PL011.h"
 
 // pid_t next_pid = 1;
 
 extern void     main_console();
 
 extern uint32_t tos_user;
+// extern uint32_t tos_console;
+// extern uint32_t tos_P3;
 
 pcb_t pcb[ table_size ], *current = NULL;
 void* current_tos_user = &tos_user;
@@ -32,7 +35,7 @@ void scheduler_initialise( ctx_t* ctx ) {
     pcb[ 0 ].ctx.sp    = ( uint32_t ) set_user_stack( 1000 );
     pcb[ 0 ].running   = 1;
 
-    for (int i = 1; i < table_size - 1; i++) {
+    for (int i = 1; i < table_size; i++) {
         memset( &pcb[ i ], 0, sizeof( pcb_t ) );
         pcb[ i ].pid       = 100;
         pcb[ i ].ctx.cpsr  = 0xFF;
@@ -44,39 +47,39 @@ void scheduler_initialise( ctx_t* ctx ) {
     current = &pcb[ 0 ]; memcpy( ctx, &current->ctx, sizeof( ctx_t ) );
 }
 
-pcb_t next_process() {
+pid_t next_pid() {
     pid_t current_pid = current->pid;
     for ( int i = current_pid + 1; i < table_size + current_pid; i++ ) {
         int pid_next = i % table_size;
-        if ( pcb[ pid_next ].running ) return pcb[ pid_next ];
+        if ( pcb[ pid_next ].running ) return pid_next;
     }
-    return *current;
+    return current_pid;
 }
 
 void scheduler_run( ctx_t* ctx ) {
-    pcb_t next = next_process();
+    pid_t next = next_pid();
 
-    memcpy( &current->ctx, ctx, sizeof( ctx_t ) );
-    memcpy( ctx, &next.ctx, sizeof( ctx_t ) );
+    memcpy( &(current->ctx), ctx, sizeof( ctx_t ) );
+    memcpy( ctx, &pcb[ next ].ctx, sizeof( ctx_t ) );
 
-    current = &next;
+    current = &pcb[ next];
 }
 
 pid_t scheduler_fork( ctx_t* ctx ) {
     pid_t new = new_pid();
     // if new_pid == -1 then no enough space
-    memcpy( &pcb[ new ], current, sizeof( pcb_t ));
-    // memcpy( &pcb[ new ].ctx, ctx, sizeof( ctx_t ));
-
+    memcpy( &pcb[ new ].ctx, ctx, sizeof( ctx_t ));
     pcb[ new ].pid          = new;
     pcb[ new ].ctx.gpr[ 0 ] = 0;
+    pcb[ new ].ctx.cpsr     = 0x50;
     pcb[ new ].ctx.sp       = ( uint32_t ) set_user_stack( 1000 );
-    pcb[ new ].running      = 0;
+    pcb[ new ].running      = 1;
 
     return pcb[ new ].pid;
 }
 
-void scheduler_exec( uint32_t pc ) {
-    current->ctx.pc   = pc;
-    current->running  = 1;
+void scheduler_exec( ctx_t* ctx ) {
+    uint32_t pc     = ( uint32_t )( ctx->gpr[0] );
+    current->ctx.pc = pc;
+    memcpy( ctx, &(current->ctx), sizeof( ctx_t ));
 } 

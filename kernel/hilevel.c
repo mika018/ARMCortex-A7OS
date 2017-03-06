@@ -124,8 +124,7 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
       break;
     }
     case 0x03 : { // 0x03 => exec( x )
-      uint32_t pc = ( uint32_t )( ctx->gpr[0] );
-      scheduler_exec( pc );
+      scheduler_exec( ctx );
       break;
     }
     default   : { // 0x?? => unknown/unsupported
@@ -144,6 +143,7 @@ void hilevel_handler_irq( ctx_t* ctx ) {
   // Step 4: handle the interrupt, then clear (or reset) the source.
 
   if( id == GIC_SOURCE_TIMER0 ) {
+    PL011_putc( UART0, 'T', true );
     scheduler_run( ctx );
     TIMER0->Timer1IntClr = 0x01;
   }

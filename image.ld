@@ -16,6 +16,6 @@ SECTIONS {
   .       = . + 0x00001000;
   tos_svc = .;
   /* allocate stack space for user processes  */
-  .       = . + 0x00040000;
+   .       = . + 0x00050000;
   tos_user = .;
 }
