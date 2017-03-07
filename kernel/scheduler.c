@@ -85,9 +85,10 @@ void scheduler_exec( ctx_t* ctx ) {
 }
 
 void scheduler_exit( ctx_t* ctx ) {
-    int32_t exit_code = ( uint32_t )( ctx->gpr[0] );
+    int32_t exit_code = ( int32_t )( ctx->gpr[0] );
     if ( exit_code == 0) {  // EXIT_SUCCESS
-        memcpy( &(current->ctx), ctx, sizeof( ctx_t ) );
+        // memcpy( &(current->ctx), ctx, sizeof( ctx_t ) );
         current->running = 0;
     }
+    scheduler_run( ctx );
 }
