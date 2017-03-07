@@ -9,7 +9,7 @@ extern uint32_t tos_user;
 // extern uint32_t tos_console;
 // extern uint32_t tos_P3;
 
-pcb_t pcb[ table_size ], *current = NULL;
+pcb_t pcb[ TABLE_SIZE ], *current = NULL;
 void* current_tos_user = &tos_user;
 
 void* set_user_stack( int32_t size ) {
@@ -19,7 +19,7 @@ void* set_user_stack( int32_t size ) {
 }
 
 pid_t new_pid() {
-    for(int i = 0; i < table_size; i++) {
+    for(int i = 0; i < TABLE_SIZE; i++) {
         if(!pcb[ i ].running) {
             return i;
         }
@@ -35,7 +35,7 @@ void scheduler_initialise( ctx_t* ctx ) {
     pcb[ 0 ].ctx.sp    = ( uint32_t ) set_user_stack( 1000 );
     pcb[ 0 ].running   = 1;
 
-    for (int i = 1; i < table_size; i++) {
+    for (int i = 1; i < TABLE_SIZE; i++) {
         memset( &pcb[ i ], 0, sizeof( pcb_t ) );
         pcb[ i ].pid       = 100;
         pcb[ i ].ctx.cpsr  = 0xFF;
@@ -49,8 +49,8 @@ void scheduler_initialise( ctx_t* ctx ) {
 
 pid_t next_pid() {
     pid_t current_pid = current->pid;
-    for ( int i = current_pid + 1; i < table_size + current_pid; i++ ) {
-        int pid_next = i % table_size;
+    for ( int i = current_pid + 1; i < TABLE_SIZE + current_pid; i++ ) {
+        int pid_next = i % TABLE_SIZE;
         if ( pcb[ pid_next ].running ) return pid_next;
     }
     return current_pid;
@@ -82,4 +82,12 @@ void scheduler_exec( ctx_t* ctx ) {
     uint32_t pc     = ( uint32_t )( ctx->gpr[0] );
     current->ctx.pc = pc;
     memcpy( ctx, &(current->ctx), sizeof( ctx_t ));
-} 
+}
+
+void scheduler_exit( ctx_t* ctx ) {
+    int32_t exit_code = ( uint32_t )( ctx->gpr[0] );
+    if ( exit_code == 0) {  // EXIT_SUCCESS
+        memcpy( &(current->ctx), ctx, sizeof( ctx_t ) );
+        current->running = 0;
+    }
+}

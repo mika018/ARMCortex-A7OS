@@ -18,7 +18,7 @@
  *   preservation and restoration prologue and epilogue, and
  * - a type that captures a process PCB.
  */
-#define table_size 15
+#define TABLE_SIZE 15
 
 typedef int pid_t;
 
@@ -36,6 +36,7 @@ void scheduler_initialise( ctx_t* ctx );
 void scheduler_run( ctx_t* ctx );
 pid_t scheduler_fork( ctx_t* ctx );
 void scheduler_exec( ctx_t* ctx );
+void scheduler_exit( ctx_t* ctx );
 
 /*
 typedef struct {

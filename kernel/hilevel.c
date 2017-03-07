@@ -127,6 +127,10 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
       scheduler_exec( ctx );
       break;
     }
+    case 0x04 : { // 0x03 => exit( x )
+      scheduler_exit( ctx );
+      break;
+    }
     default   : { // 0x?? => unknown/unsupported
       break;
     }
