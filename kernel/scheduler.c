@@ -32,7 +32,7 @@ void scheduler_initialise( ctx_t* ctx ) {
     pcb[ 0 ].pid       = new_pid();
     pcb[ 0 ].ctx.cpsr  = 0x50;
     pcb[ 0 ].ctx.pc    = ( uint32_t ) ( &main_console );
-    pcb[ 0 ].ctx.sp    = ( uint32_t ) set_user_stack( 1000 );
+    pcb[ 0 ].ctx.sp    = ( uint32_t ) set_user_stack( 3000 );
     pcb[ 0 ].running   = 1;
 
     for (int i = 1; i < TABLE_SIZE; i++) {
@@ -72,7 +72,7 @@ pid_t scheduler_fork( ctx_t* ctx ) {
     pcb[ new ].pid          = new;
     pcb[ new ].ctx.gpr[ 0 ] = 0;
     pcb[ new ].ctx.cpsr     = 0x50;
-    pcb[ new ].ctx.sp       = ( uint32_t ) set_user_stack( 1000 );
+    pcb[ new ].ctx.sp       = ( uint32_t ) set_user_stack( 3000 );
     pcb[ new ].running      = 1;
 
     return pcb[ new ].pid;
@@ -87,8 +87,9 @@ void scheduler_exec( ctx_t* ctx ) {
 void scheduler_exit( ctx_t* ctx ) {
     int32_t exit_code = ( int32_t )( ctx->gpr[0] );
     if ( exit_code == 0) {  // EXIT_SUCCESS
-        // memcpy( &(current->ctx), ctx, sizeof( ctx_t ) );
         current->running = 0;
+        // scheduler_run( ctx );
+        current = &pcb[ 0 ];
+        memcpy( ctx, &(current->ctx), sizeof( ctx_t ) );
     }
-    scheduler_run( ctx );
 }
