@@ -58,14 +58,16 @@ void main_console() {
   char* p, x[ 1024 ];
 
   while( 1 ) {
+    // let it print C here
     puts( "shell$ ", 7 ); gets( x, 1024 ); p = strtok( x, " " );
 
     if     ( 0 == strcmp( p, "fork" ) ) {
       pid_t pid = fork();
 
       if( 0 == pid ) {
-        void* addr = load( strtok( NULL, " " ) );
-        exec( addr );
+        void* addr   = load( strtok( NULL, " " ) );
+        int priority = atoi( strtok( NULL, " " ) );
+        exec( addr, priority );
       }
     } 
     else if( 0 == strcmp( p, "kill" ) ) {

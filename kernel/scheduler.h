@@ -30,6 +30,8 @@ typedef struct pcb_t {
   pid_t pid;
   ctx_t ctx;
   bool running;
+  uint32_t init_priority;
+  uint32_t curr_priority;
 } pcb_t;
 
 void scheduler_initialise( ctx_t* ctx );

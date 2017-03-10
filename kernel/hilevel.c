@@ -2,77 +2,7 @@
 #include "scheduler.h"
 
 
-// void scheduler( ctx_t* ctx ) {
-//   // if      ( current == &pcb[ 0 ] ) {
-//   //   memcpy( &pcb[ 0 ].ctx, ctx, sizeof( ctx_t ) );
-//   //   memcpy( ctx, &pcb[ 1 ].ctx, sizeof( ctx_t ) );
-//   //   current = &pcb[ 1 ];
-//   // }
-//   // else if ( current == &pcb[ 1 ] ) {
-//   //   memcpy( &pcb[ 1 ].ctx, ctx, sizeof( ctx_t ) );
-//   //   memcpy( ctx, &pcb[ 2 ].ctx, sizeof( ctx_t ) );
-//   //   current = &pcb[ 2 ];
-//   // }
-//   // else if ( current == &pcb[ 2 ] ) {
-//   //   memcpy( &pcb[ 2 ].ctx, ctx, sizeof( ctx_t ) );
-//   //   memcpy( ctx, &pcb[ 3 ].ctx, sizeof( ctx_t ) );
-//   //   current = &pcb[ 3 ];
-//   // }
-//   // else if ( current == &pcb[ 3 ] ) {
-//   //   memcpy( &pcb[ 3 ].ctx, ctx, sizeof( ctx_t ) );
-//   //   memcpy( ctx, &pcb[ 0 ].ctx, sizeof( ctx_t ) );
-//   //   current = &pcb[ 0 ];
-//   // }
-
-//   return;
-// }
-
 void hilevel_handler_rst( ctx_t* ctx              ) {
-  /* Initialise PCBs representing processes stemming from execution of
-   * the two user programs.  Note in each case that
-   *
-   * - the CPSR value of 0x50 means the processor is switched into USR
-   *   mode, with IRQ interrupts enabled, and
-   * - the PC and SP values matche the entry point and top of stack.
-   */
-  // memset( &pcb[ 0 ], 0, sizeof( pcb_t ) );
-  // pcb[ 0 ].pid      = 1;
-  // pcb[ 0 ].ctx.cpsr = 0x50;
-  // pcb[ 0 ].ctx.pc   = ( uint32_t )( &main_console );
-  // pcb[ 0 ].ctx.sp   = ( uint32_t )( &tos_console  );
-
-  // memset( &pcb[ 1 ], 0, sizeof( pcb_t ) );
-  // pcb[ 0 ].pid      = 2;
-  // pcb[ 0 ].ctx.cpsr = 0x50;
-  // pcb[ 0 ].ctx.pc   = ( uint32_t )( &main_P3 );
-  // pcb[ 0 ].ctx.sp   = ( uint32_t )( &tos_P3  );
-  //
-  // memset( &pcb[ 2 ], 0, sizeof( pcb_t ) );
-  // pcb[ 1 ].pid      = 3;
-  // pcb[ 1 ].ctx.cpsr = 0x50;
-  // pcb[ 1 ].ctx.pc   = ( uint32_t )( &main_P4 );
-  // pcb[ 1 ].ctx.sp   = ( uint32_t )( &tos_P4  );
-  //
-  // memset( &pcb[ 3 ], 0, sizeof( pcb_t ) );
-  // pcb[ 2 ].pid      = 4;
-  // pcb[ 2 ].ctx.cpsr = 0x50;
-  // pcb[ 2 ].ctx.pc   = ( uint32_t )( &main_P5 );
-  // pcb[ 2 ].ctx.sp   = ( uint32_t )( &tos_P5  );
-
-  /* Once the PCBs are initialised, we (arbitrarily) select one to be
-   * restored (i.e., executed) when the function then returns.
-   */
-
-  // current = &pcb[ 0 ]; memcpy( ctx, &current->ctx, sizeof( ctx_t ) );
-
-  /* Configure the mechanism for interrupt handling by
-   *
-   * - configuring timer st. it raises a (periodic) interrupt for each
-   *   timer tick,
-   * - configuring GIC st. the selected interrupts are forwarded to the
-   *   processor via the IRQ interrupt signal, then
-   * - enabling IRQ interrupts.
-   */
   
   scheduler_initialise( ctx );
 

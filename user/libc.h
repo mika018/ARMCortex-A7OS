@@ -57,9 +57,9 @@ extern int  read( int fd,       void* x, size_t n );
 // perform fork, returning 0 iff. child or > 0 iff. parent process
 extern int  fork();
 // perform exit, i.e., terminate process with status x
-extern void exit(       int   x );
-// perform exec, i.e., start executing program at address x
-extern void exec( const void* x );
+extern void exit( int   x );
+// perform exec, i.e., start executing program at address x with priotity p
+extern void exec( const void* x , int p );
 
 // signal process identified by pid with signal x
 extern int  kill( pid_t pid, int x );
