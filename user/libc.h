@@ -25,11 +25,12 @@ typedef int pid_t;
 
 #define SYS_YIELD     ( 0x00 )
 #define SYS_WRITE     ( 0x01 )
-#define SYS_READ      ( 0x02 )
-#define SYS_FORK      ( 0x03 )
+#define SYS_FORK      ( 0x02 )
+#define SYS_EXEC      ( 0x03 )
 #define SYS_EXIT      ( 0x04 )
-#define SYS_EXEC      ( 0x05 )
+#define SYS_PRINT     ( 0x05 )
 #define SYS_KILL      ( 0x06 )
+#define SYS_READ      ( 0x11 )
 
 #define SIG_TERM      ( 0x00 )
 #define SIG_QUIT      ( 0x01 )
@@ -53,6 +54,9 @@ extern void yield();
 extern int write( int fd, const void* x, size_t n );
 // read  n bytes into x from the file descriptor fd; return bytes read
 extern int  read( int fd,       void* x, size_t n );
+
+// prints x to the console
+extern void print( const void* x, size_t n );
 
 // perform fork, returning 0 iff. child or > 0 iff. parent process
 extern int  fork();

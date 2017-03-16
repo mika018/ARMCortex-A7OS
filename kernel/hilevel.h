@@ -9,7 +9,10 @@
 
 // Include functionality relating to the   kernel.
 
-#include "lolevel.h"
-#include     "int.h"
+#include       "int.h"
+#include       "ipc.h"
+#include   "lolevel.h"
+#include "scheduler.h"
+
 
 #endif

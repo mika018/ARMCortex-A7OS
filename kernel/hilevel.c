@@ -1,10 +1,10 @@
 #include "hilevel.h"
-#include "scheduler.h"
 
 
 void hilevel_handler_rst( ctx_t* ctx              ) {
   
   scheduler_initialise( ctx );
+  ipc_initialise();
 
   TIMER0->Timer1Load  = 0x00100000; // select period = 2^20 ticks ~= 1 sec
   TIMER0->Timer1Ctrl  = 0x00000002; // select 32-bit   timer
@@ -59,6 +59,15 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
     }
     case 0x04 : { // 0x03 => exit( x )
       scheduler_exit( ctx );
+      break;
+    }
+    case 0x05 : { // 0x01 => print( x, n )
+      char*  x = ( char* )( ctx->gpr[ 0 ] );
+      int    n = ( int   )( ctx->gpr[ 1 ] );
+
+      for( int i = 0; i < n; i++ ) {
+        PL011_putc( UART0, *x++, true );
+      }
       break;
     }
     default   : { // 0x?? => unknown/unsupported

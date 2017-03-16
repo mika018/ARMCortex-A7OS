@@ -39,6 +39,7 @@ void scheduler_run( ctx_t* ctx );
 pid_t scheduler_fork( ctx_t* ctx );
 void scheduler_exec( ctx_t* ctx );
 void scheduler_exit( ctx_t* ctx );
+pid_t get_pid();
 
 /*
 typedef struct {

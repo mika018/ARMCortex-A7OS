@@ -26,6 +26,10 @@ pid_t new_pid() {
     return -1;
 }
 
+pid_t get_pid() {
+    return current->pid;
+}
+
 void scheduler_initialise( ctx_t* ctx ) {
     memset( &pcb[ 0 ], 0, sizeof( pcb_t ) );
     pcb[ 0 ].pid            = new_pid();
@@ -87,6 +91,7 @@ void scheduler_run( ctx_t* ctx ) {
 pid_t scheduler_fork( ctx_t* ctx ) {
     pid_t new = new_pid();
     // if new_pid == -1 then no enough space
+    memcpy( &pcb[ new ], current, sizeof( pcb_t ));
     memcpy( &pcb[ new ].ctx, ctx, sizeof( ctx_t ));
     pcb[ new ].pid           = new;
     pcb[ new ].ctx.gpr[ 0 ]  = 0;
