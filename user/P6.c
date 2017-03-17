@@ -1,18 +1,17 @@
 #include "P6.h"
 
-
-#define NO_OF_PHILOSOPHERS 2
-#define READ 0
-#define WRITE 1
-#define INIT 2
-#define EAT 3
-#define THINK 4
-#define ODD 5
-#define EVEN 6
-
 int child_buffer[NO_OF_PHILOSOPHERS];
 int     child_id[NO_OF_PHILOSOPHERS];
 
+int rnd = ODD;
+
+int next_round() {
+	if( rnd == ODD ) {
+		return EVEN;
+	} else {
+		return ODD;
+	}
+}
 
 void main_P6() {
 	for( int i = 0; i < NO_OF_PHILOSOPHERS; i++ ){
@@ -53,14 +52,13 @@ void main_P6() {
 			child_id[ i ] = res;
 		}
 	}
-    int round = ODD;
 	pid_t pid_parent = get_pid();
 	for( int i = 0; i < NO_OF_PHILOSOPHERS; i++ ){
 		msend( pid_parent, child_id[ i ], INIT );
 	}
     yield();
 	while( 1 ) { // Parent process
-        switch ( round ) {
+        switch ( rnd ) {
             case ODD: {
                 for( int i = 0; i < NO_OF_PHILOSOPHERS; i++ ){
                     if( i % 2 == 0 ) {
@@ -69,7 +67,7 @@ void main_P6() {
                         msend( pid_parent, child_id[ i ], THINK );
                     }
                 }
-                round = EVEN;
+				break;
             }
             case EVEN: {
                 for( int i = 0; i < NO_OF_PHILOSOPHERS; i++ ){
@@ -79,10 +77,11 @@ void main_P6() {
                         msend( pid_parent, child_id[ i ], EAT );
                     }
                 }
-                round = ODD;
+				break;
             }
-        }      
-        print( "Waiter      : SWITCH BOYS\n", 26);
+        } 
+        print( "Waiter       : SWITCH BOYS\n", 27);
+		rnd = next_round();
         yield();
 	}
 	exit( EXIT_SUCCESS );
