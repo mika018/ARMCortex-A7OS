@@ -114,10 +114,20 @@ void scheduler_exec( ctx_t* ctx ) {
 
 void scheduler_exit( ctx_t* ctx ) {
     int32_t exit_code = ( int32_t )( ctx->gpr[0] );
-    if ( exit_code == 0) {  // EXIT_SUCCESS
+    if( exit_code == 0) {  // EXIT_SUCCESS
         current->running = 0;
         // scheduler_run( ctx );
         current = &pcb[ 0 ];
         memcpy( ctx, &(current->ctx), sizeof( ctx_t ) );
     }
+}
+
+int scheduler_kill( pid_t pid, int sig ) {
+    for( int i = 0; i < TABLE_SIZE; i++ ) {
+        if( pcb[ i ].pid == pid ) {
+            pcb[ i ].running = 0;
+            return 0;
+        }
+    }
+    return -1;
 }

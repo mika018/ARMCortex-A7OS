@@ -34,11 +34,12 @@ typedef struct pcb_t {
   uint32_t curr_priority;
 } pcb_t;
 
-void scheduler_initialise( ctx_t* ctx );
-void scheduler_run( ctx_t* ctx );
+void  scheduler_initialise( ctx_t* ctx );
+void  scheduler_run( ctx_t* ctx );
 pid_t scheduler_fork( ctx_t* ctx );
-void scheduler_exec( ctx_t* ctx );
-void scheduler_exit( ctx_t* ctx );
+void  scheduler_exec( ctx_t* ctx );
+void  scheduler_exit( ctx_t* ctx );
+int   scheduler_kill( pid_t pid, int sig );
 pid_t scheduler_get_pid();
 
 /*
