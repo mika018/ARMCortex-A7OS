@@ -26,7 +26,7 @@ pid_t new_pid() {
     return -1;
 }
 
-pid_t get_pid() {
+pid_t scheduler_get_pid() {
     return current->pid;
 }
 

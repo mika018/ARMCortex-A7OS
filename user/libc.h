@@ -24,13 +24,16 @@ typedef int pid_t;
  */
 
 #define SYS_YIELD     ( 0x00 )
-#define SYS_WRITE     ( 0x01 )
+#define SYS_GETPID    ( 0x01 )
 #define SYS_FORK      ( 0x02 )
 #define SYS_EXEC      ( 0x03 )
 #define SYS_EXIT      ( 0x04 )
 #define SYS_PRINT     ( 0x05 )
 #define SYS_KILL      ( 0x06 )
+#define SYS_MSEND     ( 0x07 )
+#define SYS_MRECEIVE  ( 0x08 )
 #define SYS_READ      ( 0x11 )
+#define SYS_WRITE     ( 0x12 )
 
 #define SIG_TERM      ( 0x00 )
 #define SIG_QUIT      ( 0x01 )
@@ -55,6 +58,11 @@ extern int write( int fd, const void* x, size_t n );
 // read  n bytes into x from the file descriptor fd; return bytes read
 extern int  read( int fd,       void* x, size_t n );
 
+// sends a signal x from process with id pid_from to process with id pid_to
+extern void msend( int pid_from, int pid_to, int x );
+// receive a signal sent to process with id pid_to
+extern int mreceive( int pid_to );
+
 // prints x to the console
 extern void print( const void* x, size_t n );
 
@@ -67,5 +75,8 @@ extern void exec( const void* x , int p );
 
 // signal process identified by pid with signal x
 extern int  kill( pid_t pid, int x );
+
+// returns a pid of a currently running process
+extern int get_pid();
 
 #endif

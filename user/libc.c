@@ -63,6 +63,41 @@ void print( const void* x, size_t n ) {
               : "r0", "r1" );
 }
 
+void msend( int pid_from, int pid_to, int x ) {
+  asm volatile( "mov r0, %1 \n" // assign r0 = pid_from
+                "mov r1, %2 \n" // assign r1 =   pid_to
+                "mov r2, %3 \n" // assign r2 =        x
+                "svc %0     \n" // make system call SYS_MSEND
+              :  
+              : "I" (SYS_MSEND), "r" (pid_from), "r" (pid_to), "r" (x) 
+              : "r0", "r1", "r2" );
+}
+
+int mreceive( int pid_to ) {
+  int r;
+
+  asm volatile( "mov r0, %2 \n" // assign r0 = pid_to
+                "svc %1     \n" // make system call SYS_MRECEIVE
+                "mov %0, r0 \n" // assign r  = r0
+              : "=r" (r) 
+              : "I" (SYS_MRECEIVE), "r" (pid_to)
+              : "r0" );
+
+  return r;
+}
+
+int get_pid() {
+  int r;
+
+  asm volatile( "svc %1     \n" // make system call SYS_GETPID
+                "mov %0, r0 \n" // assign r  = r0
+              : "=r" (r) 
+              : "I" (SYS_GETPID)
+              : );
+
+  return r;
+}
+
 int write( int fd, const void* x, size_t n ) {
   int r;
 

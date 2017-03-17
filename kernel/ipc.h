@@ -21,7 +21,7 @@ typedef struct message {
 } message;
 
 void ipc_initialise();
-int pipe_send_message( int source, int destination, int signal );
-int pipe_receive_message( int destination );
+void ipc_send_message( int source, int destination, int signal );
+int  ipc_receive_message( int destination );
 
 #endif

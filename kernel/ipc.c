@@ -28,19 +28,17 @@ int find_message_for( int destination ) {
 }
 
 //change to check if dest is still waiting.
-int pipe_send_message( int source, int destination, int signal ) {
+void ipc_send_message( int source, int destination, int signal ) {
     int id = new_message_id();
     if ( id !=  -1 ) { 
         messages[ id ].pid_src = source;
         messages[ id ].pid_des = destination;
         messages[ id ].signal  = signal;
         messages[ id ].active  = 1;
-        return 1;
     }
-    return id;
 }
 
-int pipe_receive_message( int destination ) {
+int ipc_receive_message( int destination ) {
     int id = find_message_for( destination );
     if ( id != -1 ) {
         messages[ id ].active = 0;

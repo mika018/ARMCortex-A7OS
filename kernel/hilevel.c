@@ -36,16 +36,8 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
       scheduler_run( ctx );
       break;
     }
-    case 0x01 : { // 0x01 => write( fd, x, n )
-      int   fd = ( int   )( ctx->gpr[ 0 ] );
-      char*  x = ( char* )( ctx->gpr[ 1 ] );
-      int    n = ( int   )( ctx->gpr[ 2 ] );
-
-      for( int i = 0; i < n; i++ ) {
-        PL011_putc( UART0, *x++, true );
-      }
-
-      ctx->gpr[ 0 ] = n;
+    case 0x01 : { // 0x01 => get_pid()
+      ctx->gpr[ 0 ] = scheduler_get_pid();
       break;
     }
     case 0x02 : { // 0x02 => fork()
@@ -57,17 +49,48 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
       scheduler_exec( ctx );
       break;
     }
-    case 0x04 : { // 0x03 => exit( x )
+    case 0x04 : { // 0x04 => exit( x )
       scheduler_exit( ctx );
       break;
     }
-    case 0x05 : { // 0x01 => print( x, n )
+    case 0x05 : { // 0x05 => print( x, n )
       char*  x = ( char* )( ctx->gpr[ 0 ] );
       int    n = ( int   )( ctx->gpr[ 1 ] );
 
       for( int i = 0; i < n; i++ ) {
         PL011_putc( UART0, *x++, true );
       }
+      break;
+    }
+    case 0x06 : { // 0x06 => kill
+      break;
+    }
+    case 0x07 : { // 0x07 => msend( pid_from, pid_to, x, n )
+      int pid_from = ( int )( ctx->gpr[ 0 ] );
+      int   pid_to = ( int )( ctx->gpr[ 1 ] );
+      int        x = ( int )( ctx->gpr[ 2 ] );
+
+      ipc_send_message( pid_from, pid_to, x);
+      break;
+    }
+    case 0x08 : { // 0x08 => mreceive( pid_to )
+      int pid_to = ( int )( ctx->gpr[ 0 ] );
+
+      int r = ipc_receive_message( pid_to );
+
+      ctx->gpr[ 0 ] = r;
+      break;
+    }
+    case 0x12 : { // 0x12 => write( fd, x, n )
+      int   fd = ( int   )( ctx->gpr[ 0 ] );
+      char*  x = ( char* )( ctx->gpr[ 1 ] );
+      int    n = ( int   )( ctx->gpr[ 2 ] );
+
+      for( int i = 0; i < n; i++ ) {
+        PL011_putc( UART0, *x++, true );
+      }
+
+      ctx->gpr[ 0 ] = n;
       break;
     }
     default   : { // 0x?? => unknown/unsupported
@@ -86,7 +109,7 @@ void hilevel_handler_irq( ctx_t* ctx ) {
   // Step 4: handle the interrupt, then clear (or reset) the source.
 
   if( id == GIC_SOURCE_TIMER0 ) {
-    PL011_putc( UART0, 'T', true );
+    // PL011_putc( UART0, 'T', true );
     scheduler_run( ctx );
     TIMER0->Timer1IntClr = 0x01;
   }
