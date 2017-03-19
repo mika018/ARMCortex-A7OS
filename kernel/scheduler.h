@@ -3,7 +3,7 @@
 
 // Include functionality relating to newlib (the standard C library).
 
-#include <stdlib.h>
+// #include <stdlib.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -28,6 +28,7 @@ typedef struct {
 
 typedef struct pcb_t {
   pid_t pid;
+  pid_t parent_pid;
   ctx_t ctx;
   bool running;
   uint32_t init_priority;

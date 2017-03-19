@@ -71,18 +71,30 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
 			ctx->gpr[ 0 ] = result;
 			break;
 		}
-		case 0x07 : { // 0x07 => msend( pid_from, pid_to, x, n )
-			int pid_from = ( int )( ctx->gpr[ 0 ] );
-			int   pid_to = ( int )( ctx->gpr[ 1 ] );
-			int        x = ( int )( ctx->gpr[ 2 ] );
+		case 0x07 : { // 0x07 => msend( pipe_id, pid_src, pid_des, x)
+			int   pipe_id = ( int   )( ctx->gpr[ 0 ] );
+			pid_t pid_src = ( pid_t )( ctx->gpr[ 1 ] );
+			pid_t pid_des = ( pid_t )( ctx->gpr[ 2 ] );
+			int         x = ( int   )( ctx->gpr[ 3 ] );
+			
+			ipc_send_message( pipe_id, pid_src, pid_des, x );
 
-			ipc_send_message( pid_from, pid_to, x);
 			break;
 		}
-		case 0x08 : { // 0x08 => mreceive( pid_to )
-			int pid_to = ( int )( ctx->gpr[ 0 ] );
+		case 0x08 : { // 0x08 => mreceive( pipe_id, pid_des )
+			int   pipe_id = ( int   )( ctx->gpr[ 0 ] );
+			pid_t pid_des = ( pid_t )( ctx->gpr[ 1 ] );
+			
+			int r = ipc_receive_message( pipe_id, pid_des );
 
-			int r = ipc_receive_message( pid_to );
+			ctx->gpr[ 0 ] = r;
+			break;
+		}
+		case 0x09 : { // 0x08 => pipe( pid_1, pid_2 )
+			pid_t pid_1 = ( pid_t )( ctx->gpr[ 0 ] );
+			pid_t pid_2 = ( pid_t )( ctx->gpr[ 1 ] );
+
+			int r = ipc_pipe( pid_1, pid_2 );
 
 			ctx->gpr[ 0 ] = r;
 			break;

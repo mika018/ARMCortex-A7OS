@@ -32,6 +32,7 @@ typedef int pid_t;
 #define SYS_KILL      ( 0x06 )
 #define SYS_MSEND     ( 0x07 )
 #define SYS_MRECEIVE  ( 0x08 )
+#define SYS_PIPE      ( 0x09 )
 #define SYS_READ      ( 0x11 )
 #define SYS_WRITE     ( 0x12 )
 
@@ -50,18 +51,22 @@ extern int  atoi( char* x        );
 // convert integer x into ASCII string r
 extern void itoa( char* r, int x );
 
+void* memset( void *s, int c, size_t count );
+
 // cooperatively yield control of processor, i.e., invoke the scheduler
 extern void yield();
 
 // write n bytes from x to   the file descriptor fd; return bytes written
-extern int write( int fd, const void* x, size_t n );
+extern int  write( int fd, const void* x, size_t n );
 // read  n bytes into x from the file descriptor fd; return bytes read
 extern int  read( int fd,       void* x, size_t n );
 
+// initialises the pipe between two processes
+extern int  make_pipe( int pid_1, int pid_2 );
 // sends a signal x from process with id pid_from to process with id pid_to
-extern void msend( int pid_from, int pid_to, int x );
+extern void msend( int pipe_id, int pid_src, int pid_des, int x );
 // receive a signal sent to process with id pid_to
-extern int mreceive( int pid_to );
+extern int  mreceive( int pipe_id, int pid_des );
 
 // prints x to the console
 extern void print( const void* x, size_t n );
@@ -77,6 +82,6 @@ extern void exec( const void* x , int p );
 extern int  kill( pid_t pid, int x );
 
 // returns a pid of a currently running process
-extern int get_pid();
+extern int  get_pid();
 
 #endif

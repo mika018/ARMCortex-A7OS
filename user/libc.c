@@ -45,6 +45,16 @@ void itoa( char* r, int x ) {
   return;
 }
 
+void* memset( void *s, int c, size_t count ) {
+  char *xs = s;
+  
+  while( count-- ) {
+    *xs++ = c;
+  }
+  
+  return s;
+}
+
 void yield() {
   asm volatile( "svc %0     \n" // make system call SYS_YIELD
               :
@@ -63,25 +73,41 @@ void print( const void* x, size_t n ) {
               : "r0", "r1" );
 }
 
-void msend( int pid_from, int pid_to, int x ) {
-  asm volatile( "mov r0, %1 \n" // assign r0 = pid_from
-                "mov r1, %2 \n" // assign r1 =   pid_to
-                "mov r2, %3 \n" // assign r2 =        x
-                "svc %0     \n" // make system call SYS_MSEND
-              :  
-              : "I" (SYS_MSEND), "r" (pid_from), "r" (pid_to), "r" (x) 
-              : "r0", "r1", "r2" );
-}
-
-int mreceive( int pid_to ) {
+int make_pipe( int pid_1, int pid_2 ) {
   int r;
 
-  asm volatile( "mov r0, %2 \n" // assign r0 = pid_to
+  asm volatile( "mov r0, %2 \n" // assign r0 = pid_1
+                "mov r1, %3 \n" // assign r1 = pid_2
                 "svc %1     \n" // make system call SYS_MRECEIVE
                 "mov %0, r0 \n" // assign r  = r0
               : "=r" (r) 
-              : "I" (SYS_MRECEIVE), "r" (pid_to)
-              : "r0" );
+              : "I" (SYS_PIPE), "r" (pid_1), "r" (pid_2)
+              : "r0", "r1" );
+
+  return r;
+}
+
+void msend( int pipe_id, int pid_src, int pid_des, int x ) {
+  asm volatile( "mov r0, %1 \n" // assign r0 = pipe_id
+                "mov r1, %2 \n" // assign r1 = pid_src
+                "mov r2, %3 \n" // assign r2 = pid_des
+                "mov r3, %4 \n" // assign r3 =       x
+                "svc %0     \n" // make system call SYS_MSEND
+              :  
+              : "I" (SYS_MSEND), "r" (pipe_id), "r" (pid_src), "r" (pid_des), "r" (x) 
+              : "r0", "r1", "r2", "r3" );
+}
+
+int mreceive( int pipe_id, int pid_des ) {
+  int r;
+
+  asm volatile( "mov r0, %2 \n" // assign r0 = pipe_id
+                "mov r1, %3 \n" // assign r1 = pid_des
+                "svc %1     \n" // make system call SYS_MRECEIVE
+                "mov %0, r0 \n" // assign r  = r0
+              : "=r" (r) 
+              : "I" (SYS_MRECEIVE), "r" (pipe_id), "r" (pid_des)
+              : "r0", "r1" );
 
   return r;
 }
