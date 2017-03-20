@@ -42,6 +42,7 @@ void  scheduler_exec( ctx_t* ctx );
 void  scheduler_exit( ctx_t* ctx );
 int   scheduler_kill( pid_t pid, int sig );
 pid_t scheduler_get_pid();
+pid_t scheduler_get_parent_pid();
 
 /*
 typedef struct {

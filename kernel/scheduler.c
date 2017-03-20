@@ -30,6 +30,10 @@ pid_t scheduler_get_pid() {
     return current->pid;
 }
 
+pid_t scheduler_get_parent_pid(){
+    return current->parent_pid;
+}
+
 void scheduler_initialise( ctx_t* ctx ) {
     memset( &pcb[ 0 ], 0, sizeof( pcb_t ) );
     pcb[ 0 ].pid            = 0;

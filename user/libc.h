@@ -35,6 +35,7 @@ typedef int pid_t;
 #define SYS_PIPE      ( 0x09 )
 #define SYS_READ      ( 0x11 )
 #define SYS_WRITE     ( 0x12 )
+#define SYS_GETPARENT ( 0x13 )
 
 #define SIG_TERM      ( 0x00 )
 #define SIG_QUIT      ( 0x01 )
@@ -51,7 +52,7 @@ extern int  atoi( char* x        );
 // convert integer x into ASCII string r
 extern void itoa( char* r, int x );
 
-void* memset( void *s, int c, size_t count );
+extern void* memset( void *s, int c, size_t count );
 
 // cooperatively yield control of processor, i.e., invoke the scheduler
 extern void yield();
@@ -83,5 +84,7 @@ extern int  kill( pid_t pid, int x );
 
 // returns a pid of a currently running process
 extern int  get_pid();
+// returns a parent pid of a currently running process
+extern int  get_parent_pid();
 
 #endif

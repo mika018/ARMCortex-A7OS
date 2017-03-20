@@ -111,6 +111,10 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
 			ctx->gpr[ 0 ] = n;
 			break;
 		}
+		case 0x13 : { // 0x01 => get_parent_pid()
+			ctx->gpr[ 0 ] = scheduler_get_parent_pid();
+			break;
+		}
 		default   : { // 0x?? => unknown/unsupported
 			break;
 		}

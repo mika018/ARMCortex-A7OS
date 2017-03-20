@@ -124,6 +124,18 @@ int get_pid() {
   return r;
 }
 
+int get_parent_pid() {
+  int r;
+
+  asm volatile( "svc %1     \n" // make system call SYS_GETPARENT
+                "mov %0, r0 \n" // assign r  = r0
+              : "=r" (r) 
+              : "I" (SYS_GETPARENT)
+              : );
+
+  return r;
+}
+
 int write( int fd, const void* x, size_t n ) {
   int r;
 

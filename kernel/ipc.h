@@ -22,6 +22,7 @@ typedef struct buffer_t {
 } buffer_t;
 
 typedef struct pipe_t {
+  int      pipe_id;
   buffer_t buff_1;
   buffer_t buff_2;
   bool     active;

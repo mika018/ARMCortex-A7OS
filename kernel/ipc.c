@@ -7,27 +7,28 @@ pipe_t pipe[ NO_OF_PIPES ];
 void ipc_initialise() {
     for(int i = 0; i < NO_OF_PIPES; i++) {
         memset( &pipe[ 0 ], 0, sizeof( pipe_t ) );
+        pipe[ i ].pipe_id = i;
     }
 }
 
 int new_pipe_id() {
     for( int i = 0; i < NO_OF_PIPES; i++ ) {
-        if( !pipe[ i ].active ) return i;
+        if( !pipe[ i ].active ) return pipe[ i ].pipe_id;
     }
     return -1;
 }
 
-void buffer_initialise( buffer_t buffer, pid_t pid ) {
-    buffer.pid    = pid;
-    buffer.signal = EMPTY;
+void buffer_initialise( buffer_t *buffer, pid_t pid ) {
+    buffer->pid    = pid;
+    buffer->signal = EMPTY;
 }
 
 int new_pipe( pid_t pid_1, pid_t pid_2 ) {
     int id = new_pipe_id();
     if( id != -1 ) {
-        buffer_initialise( pipe[ id ].buff_1, pid_1 );
-        buffer_initialise( pipe[ id ].buff_2, pid_2 );
-        pipe[ id ].active        = 1;
+        buffer_initialise( &pipe[ id ].buff_1, pid_1 );
+        buffer_initialise( &pipe[ id ].buff_2, pid_2 );
+        pipe[ id ].active = 1;
     } else {
         print("DEBUG ipc_new_pipe: All pipes busy\n", 35);
     }
