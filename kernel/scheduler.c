@@ -97,7 +97,7 @@ pid_t scheduler_fork( ctx_t* ctx ) {
     pcb[ new ].ctx.cpsr      = 0x50;
     pcb[ new ].ctx.sp        = ( uint32_t ) set_user_stack( 5000 );
     pcb[ new ].running       = 1;
-    pcb[ new ].priority_curr = UINT32_MAX;
+    pcb[ new ].priority_curr = UINT_32_MAX;
 
     return pcb[ new ].pid;
 }

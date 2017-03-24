@@ -18,8 +18,8 @@
  *   preservation and restoration prologue and epilogue, and
  * - a type that captures a process PCB.
  */
-#define TABLE_SIZE 15
-
+#define TABLE_SIZE  15
+#define UINT_32_MAX 4294967
 typedef int pid_t;
 
 typedef struct {
