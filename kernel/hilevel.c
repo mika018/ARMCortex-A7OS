@@ -5,6 +5,7 @@ void hilevel_handler_rst( ctx_t* ctx              ) {
   
 	scheduler_initialise( ctx );
 	ipc_initialise();
+	file_setup();
 
 	TIMER0->Timer1Load  = 0x00100000; // select period = 2^20 ticks ~= 1 sec
 	TIMER0->Timer1Ctrl  = 0x00000002; // select 32-bit   timer

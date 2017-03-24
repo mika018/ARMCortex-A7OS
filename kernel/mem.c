@@ -1,95 +1,23 @@
 #include "mem.h"
 
-void* current_memblock = 0x00;
-int   mem_block_id     = 0;
+void* new_file;
+void* new_data_block;
 
-pipe_t mem_block[ NO_OF_MEMBLOCKS ];
+file_t        file[ NO_OF_FILES ];
+disk_header_t header;
 
-void make_file( char* name ) {
-
+uint32_t get_block_address( int32_t block_row ) {
+    return block_row * BLOCK_SIZE;
 }
 
-void mem_initialise() {
-    for(int i = 0; i < NO_OF_MEMBLOCKS; i++) {
-        memset( &mem_block[ 0 ], 0, sizeof( memblock_t ) );
-    }
-}
-
-int new_pipe_id() {
-    for( int i = 0; i < NO_OF_PIPES; i++ ) {
-        if( !pipe[ i ].active ) return pipe[ i ].pipe_id;
-    }
-    return -1;
-}
-
-void buffer_initialise( buffer_t *buffer, pid_t pid ) {
-    buffer->pid    = pid;
-    buffer->signal = EMPTY;
-}
-
-int new_pipe( pid_t pid_1, pid_t pid_2 ) {
-    int id = new_pipe_id();
-    if( id != -1 ) {
-        buffer_initialise( &pipe[ id ].buff_1, pid_1 );
-        buffer_initialise( &pipe[ id ].buff_2, pid_2 );
-        pipe[ id ].active = 1;
+void file_setup() {
+    memset( &header, 0, sizeof( disk_header_t ) );
+    header.new_file       = get_block_address( 1 );
+    header.new_data_block = get_block_address( NO_OF_FILES + 1 );
+    int res = disk_wr( get_block_address( 0 ), (uint8_t*) &header, BLOCK_SIZE );
+    if( res == 0 ) {
+        print( "Disk ready!\n", 12 );
     } else {
-        print("DEBUG ipc_new_pipe: All pipes busy.\n", 35);
+        print( "Disk failed!\n", 13 );
     }
-    return id;
-}
-
-// checks if there exist a currently active pipe if not it creates a new one.
-// returns the pipe index
-int ipc_pipe( pid_t pid_1, pid_t pid_2 ) {
-    for(int i = 0; i < NO_OF_PIPES; i++) {
-        if( pipe[ i ].active ) {
-            if( pipe[ i ].buff_1.pid == pid_1 && pipe[ i ].buff_2.pid == pid_2
-             || pipe[ i ].buff_1.pid == pid_2 && pipe[ i ].buff_2.pid == pid_1) {
-                 return pipe[ i ].pipe_id;
-             } 
-        }
-    }
-    int new = new_pipe( pid_1, pid_2 );
-    return new;
-}
-
-buffer_t* find_buffer( pipe_t* pipe, pid_t pid ) {
-    if( pipe->buff_1.pid == pid ) {
-        return &( pipe->buff_1 );
-    } else if( pipe->buff_2.pid == pid ) {
-        return &( pipe->buff_2 );
-    } else {
-        print("DEBUG ipc_find_buffer: Wrong pipe selected\n", 43);
-    }
-} 
-
-// if inactive debug, if your buffer full debug, if receiver buffer full debug
-void ipc_send_message( int pipe_id, pid_t pid_src, pid_t pid_des, int sig ) {
-    buffer_t* buff_src = find_buffer( &pipe[ pipe_id ], pid_src);
-    buffer_t* buff_des = find_buffer( &pipe[ pipe_id ], pid_des);
-    if( !pipe[ pipe_id ].active ) {
-        print("DEBUG ipc_send_message: Selected pipe inactive\n", 47);
-        return;
-    } 
-    if( buff_src->signal != EMPTY ) {
-        print("DEBUG ipc_send_message: Sender's buffer is full\n", 48);
-        return;
-    }
-    if( buff_des->signal != EMPTY ) {
-        print("DEBUG ipc_send_message: Receiver's buffer is full\n", 50);
-        return;
-    }
-    buff_des->signal = sig;
-}
-
-int ipc_receive_message( int pipe_id, pid_t pid_des ) {
-    buffer_t* buff_des = find_buffer( &pipe[ pipe_id ], pid_des);
-    if( buff_des->signal == EMPTY ) {
-        print("DEBUG ipc_receive_message: Nothing to receive. Buffer empty\n", 60);
-        return EMPTY;
-    }
-    int result = buff_des->signal;
-    buff_des->signal = EMPTY;
-    return result;
 }

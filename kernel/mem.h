@@ -11,27 +11,29 @@
 // #include <limits.h>
 
 #include "libc.h"
+#include "disk.h"
 
-#define NO_OF_MEMBLOCKS 512
+#define NO_OF_BLOCKS 4096
+#define BLOCK_SIZE   256
 
-typedef struct memblock_t {
-	void* address;
-	int   dir_id;
-	int   file_id;
-	int   occupied;
-	void* next_block;
-} memblock_t;
+#define NO_OF_FILES 95
 
-// typedef struct dir_t {
-// 	int   dir_id;
-// 	void* address;
-// } dir_t;
+#define DIRECTORY 0
+#define FILE      1
 
-// typedef struct file_t {
-// 	int   dir_id;
-// 	int   file_id;
-// 	void* address;
-// 	void* next_block;
-// } file_t;
+typedef struct file_t {
+	int32_t descriptor;
+	char    name[20];
+	int32_t	no_of_blocks;
+	void*   address;
+} file_t;
+
+typedef struct disk_header_t {
+	uint32_t new_file;
+	uint32_t new_data_block;
+	char     holder[24];
+} disk_header_t;
+
+void file_setup();
 
 #endif
