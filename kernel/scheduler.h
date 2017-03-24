@@ -28,11 +28,11 @@ typedef struct {
 
 typedef struct pcb_t {
   pid_t pid;
-  pid_t parent_pid;
+  pid_t pid_parent;
   ctx_t ctx;
   bool running;
-  uint32_t init_priority;
-  uint32_t curr_priority;
+  uint32_t priority_init;
+  uint32_t priority_curr;
 } pcb_t;
 
 void  scheduler_initialise( ctx_t* ctx );
@@ -42,7 +42,7 @@ void  scheduler_exec( ctx_t* ctx );
 void  scheduler_exit( ctx_t* ctx );
 int   scheduler_kill( pid_t pid, int sig );
 pid_t scheduler_get_pid();
-pid_t scheduler_get_parent_pid();
+pid_t scheduler_get_pid_parent();
 
 /*
 typedef struct {

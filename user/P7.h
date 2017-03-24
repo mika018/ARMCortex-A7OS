@@ -10,8 +10,9 @@
 
 #define NO_OF_PHILOSOPHERS 5
 
-#define INIT 2
-#define EAT 3
+#define EMPTY 0
+#define INIT  2
+#define EAT   3
 #define THINK 4
 
 #endif

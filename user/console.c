@@ -70,7 +70,14 @@ void main_console() {
 
       if( 0 == pid ) {
         void* addr   = load( strtok( NULL, " " ) );
-        int priority = atoi( strtok( NULL, " " ) );
+        char* priority_char = strtok( NULL, " ");
+        int priority;
+        // If priority not entered set it to the default value (2)
+        if( priority_char == 0x0 ) {
+          priority = 2;
+        } else {
+          priority = atoi( priority_char );
+        }
         exec( addr, priority );
       }
     } 

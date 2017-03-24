@@ -29,7 +29,13 @@ void main_P7() {
 				print( ": THINKING\n", 11 );
 				break;
 			}
-			default   : {
+			case EMPTY: {
+				break;
+			}
+			default: {
+				print( "Philosopher ", 12 );
+				print( id, 1 );
+				print( ": UNSUPPORTED SIGNAL\n", 21 );
 				break;
 			}
 		}

@@ -1,13 +1,17 @@
-#include "ipc.h"
+#include "mem.h"
 
-#define EMPTY 0
+void* current_memblock = 0x00;
+int   mem_block_id     = 0;
 
-pipe_t pipe[ NO_OF_PIPES ];
+pipe_t mem_block[ NO_OF_MEMBLOCKS ];
 
-void ipc_initialise() {
-    for(int i = 0; i < NO_OF_PIPES; i++) {
-        memset( &pipe[ 0 ], 0, sizeof( pipe_t ) );
-        pipe[ i ].pipe_id = i;
+void make_file( char* name ) {
+
+}
+
+void mem_initialise() {
+    for(int i = 0; i < NO_OF_MEMBLOCKS; i++) {
+        memset( &mem_block[ 0 ], 0, sizeof( memblock_t ) );
     }
 }
 

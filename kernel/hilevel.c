@@ -90,7 +90,7 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
 			ctx->gpr[ 0 ] = r;
 			break;
 		}
-		case 0x09 : { // 0x08 => pipe( pid_1, pid_2 )
+		case 0x09 : { // 0x08 => make_pipe( pid_1, pid_2 )
 			pid_t pid_1 = ( pid_t )( ctx->gpr[ 0 ] );
 			pid_t pid_2 = ( pid_t )( ctx->gpr[ 1 ] );
 
@@ -111,8 +111,8 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
 			ctx->gpr[ 0 ] = n;
 			break;
 		}
-		case 0x13 : { // 0x01 => get_parent_pid()
-			ctx->gpr[ 0 ] = scheduler_get_parent_pid();
+		case 0x13 : { // 0x01 => get_pid_parent()
+			ctx->gpr[ 0 ] = scheduler_get_pid_parent();
 			break;
 		}
 		default   : { // 0x?? => unknown/unsupported
