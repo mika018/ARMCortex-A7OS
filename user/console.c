@@ -82,10 +82,18 @@ void main_console() {
       }
     } 
     else if( 0 == strcmp( p, "kill" ) ) {
-      pid_t pid = atoi( strtok( NULL, " " ) );
+      char* pid_char = strtok( NULL, " " );
       int   s   = atoi( strtok( NULL, " " ) );
-
-      kill( pid, s );
+      if( 0 == strcmp( pid_char, "all" ) ) {
+        kill( -1, s );
+      } else {
+        pid_t pid = atoi( pid_char );
+        kill( pid, s );
+      }
+    } 
+    else if( 0 == strcmp( p, "open" ) ) {
+      char* name = strtok( NULL, " " );
+      open( name );
     } 
     else {
       puts( "unknown command\n", 16 );

@@ -122,11 +122,20 @@ void scheduler_exit( ctx_t* ctx ) {
 }
 
 int scheduler_kill( pid_t pid, int sig ) {
-    for( int i = 0; i < TABLE_SIZE; i++ ) {
-        if( pcb[ i ].pid == pid ) {
-            pcb[ i ].running = 0;
-            return 0;
+    if( pid == -1 ) {   // kill all
+        for( int i = 0; i < TABLE_SIZE; i++ ) {
+            if( pcb[ i ].pid != 0 ) {
+                pcb[ i ].running = 0;
+            }
         }
+        return 0;
+    } else {
+        for( int i = 0; i < TABLE_SIZE; i++ ) {
+            if( pcb[ i ].pid == pid ) {
+                pcb[ i ].running = 0;
+                return 0;
+            }
+        }
+        return -1;
     }
-    return -1;
 }

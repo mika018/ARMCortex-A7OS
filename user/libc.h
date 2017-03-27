@@ -33,6 +33,7 @@ typedef int pid_t;
 #define SYS_MSEND     ( 0x07 )
 #define SYS_MRECEIVE  ( 0x08 )
 #define SYS_PIPE      ( 0x09 )
+#define SYS_OPEN      ( 0x10 )
 #define SYS_READ      ( 0x11 )
 #define SYS_WRITE     ( 0x12 )
 #define SYS_GETPARENT ( 0x13 )
@@ -42,6 +43,9 @@ typedef int pid_t;
 
 #define EXIT_SUCCESS  ( 0 )
 #define EXIT_FAILURE  ( 1 )
+
+#define FILE_SUCCESS  ( 0 )
+#define FILE_FAILURE  ( 1 )
 
 #define  STDIN_FILENO ( 0 )
 #define STDOUT_FILENO ( 1 )
@@ -66,7 +70,7 @@ extern int  read( int fd,       void* x, size_t n );
 extern int  make_pipe( int pid_1, int pid_2 );
 // sends a signal x from process with id pid_from to process with id pid_to
 extern void msend( int pipe_id, int pid_src, int pid_des, int x );
-// receive a signal sent to process with id pid_to
+// returns a signal sent to process with id pid_des
 extern int  mreceive( int pipe_id, int pid_des );
 
 // prints x to the console
@@ -86,5 +90,7 @@ extern int  kill( pid_t pid, int x );
 extern int  get_pid();
 // returns a parent pid of a currently running process
 extern int  get_parent_pid();
+
+extern int  open( char* name );
 
 #endif

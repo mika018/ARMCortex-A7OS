@@ -5,7 +5,8 @@ void hilevel_handler_rst( ctx_t* ctx              ) {
   
 	scheduler_initialise( ctx );
 	ipc_initialise();
-	// file_setup();
+	file_setup();
+	file_disk_load();
 
 	TIMER0->Timer1Load  = 0x00100000; // select period = 2^20 ticks ~= 1 sec
 	TIMER0->Timer1Ctrl  = 0x00000002; // select 32-bit   timer
@@ -59,7 +60,7 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
 			int    n = ( int   )( ctx->gpr[ 1 ] );
 
 			for( int i = 0; i < n; i++ ) {
-			PL011_putc( UART0, *x++, true );
+				PL011_putc( UART0, *x++, true );
 			}
 			break;
 		}
@@ -96,6 +97,14 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
 			pid_t pid_2 = ( pid_t )( ctx->gpr[ 1 ] );
 
 			int r = ipc_pipe( pid_1, pid_2 );
+
+			ctx->gpr[ 0 ] = r;
+			break;
+		}
+		case 0x10 : {
+			char* name = ( char* )( ctx->gpr[ 0 ] );
+
+			int r = file_new( name );
 
 			ctx->gpr[ 0 ] = r;
 			break;

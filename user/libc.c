@@ -71,6 +71,8 @@ void print( const void* x, size_t n ) {
               : 
               : "I" (SYS_PRINT), "r" (x), "r" (n)
               : "r0", "r1" );
+
+  return;
 }
 
 int make_pipe( int pid_1, int pid_2 ) {
@@ -134,6 +136,20 @@ int get_parent_pid() {
               : );
 
   return r;
+}
+
+int open( char* name ) {
+  int r;
+
+  asm volatile( "mov r0, %2 \n" // assign r0 = name
+                "svc %1     \n" // make system call SYS_WRITE
+                "mov %0, r0 \n" // assign r  = r0
+              : "=r" (r) 
+              : "I" (SYS_OPEN), "r" (name)
+              : "r0" );
+
+  return r;
+
 }
 
 int write( int fd, const void* x, size_t n ) {
