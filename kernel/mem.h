@@ -17,6 +17,9 @@
 #define BLOCK_SIZE   32
 
 #define MAX_FILES 95
+#define MAX_DATA_LINES 32673 // 32768 - MAX_FILES
+
+#define MAX_CONTENT 24
 
 #define DIRECTORY 0
 #define FILE      1
@@ -35,9 +38,16 @@ typedef struct disk_header_t {
 	char  holder[ 24 ];
 } disk_header_t;
 
+typedef struct data_t {
+	char    content[ MAX_CONTENT ];
+	int32_t full;
+	void*   next_data_block;
+} data_t;
+
 void file_setup();
 void file_disk_load();
 int  file_open( char* name );
 int  file_close( int fd );
+int  file_write( int fd, void* x, size_t n );
 
 #endif

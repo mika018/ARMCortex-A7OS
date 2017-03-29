@@ -93,11 +93,17 @@ void main_console() {
     } 
     else if( 0 == strcmp( p, "open" ) ) {
       char* name = strtok( NULL, " " );
-      open( name );
+      int res = open( name );
     }
     else if( 0 == strcmp( p, "close" ) ) {
       int fd = atoi( strtok( NULL, " " ) );
-      close( fd );
+      int res = close( fd );
+    } 
+    else if( 0 == strcmp( p, "write" ) ) {
+      int   fd = atoi( strtok( NULL, " " ) );
+      char* x  = strtok( NULL, " " );
+      int   n  = atoi( strtok( NULL, " " ) );
+      int res = write( fd, x, n );
     } 
     else {
       puts( "unknown command\n", 16 );

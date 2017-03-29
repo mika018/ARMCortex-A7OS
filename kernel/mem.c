@@ -2,6 +2,7 @@
 
 
 file_t        file[ MAX_FILES ];
+data_t        data[ MAX_DATA_LINES ];
 disk_header_t header;
 
 void file_setup() {
@@ -49,9 +50,9 @@ int new_file_id() {
     return -1;
 }
 
-void* get_new_data_block_address() {
+void* new_data_block_address() {
     void* old_data_block = header.new_data_block;
-    ++header.new_data_block;
+    header.new_data_block++;
     int res = disk_wr( 0, (uint8_t*) &header, BLOCK_SIZE );
     return old_data_block;
 }
@@ -68,8 +69,8 @@ int file_open( char* name ) {
     int file_id = new_file_id();
     memset( &file[ file_id ], 0, sizeof( file_t ) );
     file[ file_id ].descriptor   = FILE;
-    file[ file_id ].no_of_blocks = 0;
-    file[ file_id ].address      = get_new_data_block_address();
+    file[ file_id ].no_of_blocks = 1;
+    file[ file_id ].address      = new_data_block_address();
     file[ file_id ].active       = 1;
     set_file_name( file_id, name );
     int res = disk_wr( file_id + 1, (uint8_t*) &file[ file_id ], BLOCK_SIZE );
@@ -86,9 +87,59 @@ int file_open( char* name ) {
 
 int file_close( int fd ) {
     if( fd <= MAX_FILES ) {
-        file[ fd ].active = 0;
-        return FILE_SUCCESS;
+        memset( &file[ fd ], 0, sizeof( file_t ) );
+        int res = disk_wr( fd + 1, (uint8_t*) &file[ fd ], BLOCK_SIZE );
+        return res;
     } else {
         return FILE_FAILURE;
     }
+}
+
+int get_data_block_id( void* address ) {
+    return ( (uint32_t) address ) - MAX_FILES - 1;
+}
+
+int get_data_block_address( int index ) {
+    return MAX_FILES + index + 1;
+}
+
+int file_write( int fd, void* x, size_t n ) {
+    int data_current = get_data_block_id( file[ fd ].address );
+    void* data_next;
+    for( int i = 0; i < file[ fd ].no_of_blocks; i++ ) {
+        if( data[ data_current ].full ) {
+            data_next = data[ data_current ].next_data_block;
+            data_current = get_data_block_id( data_next );
+        }
+    }
+    // data_current is the one to write to.
+    char* input = ( char* ) x;
+    while( n != 0 ) {
+        // char aux_current[MAX_CONTENT] = data[data_current].content;
+        int size_in_use = strlen( data[ data_current ].content );
+        int size_left   = MAX_CONTENT - size_in_use;
+        char aux_append[ size_left + 1 ];
+        memset( aux_append, 0, sizeof(aux_append) );
+        if( size_left > n ) {
+            strncpy( aux_append, input, size_left );
+            n = 0;
+        } else {
+            strncpy( aux_append, input, size_left );
+            n     = n     - size_left;
+            input = input + size_left;
+        }
+        strcat( data[ data_current ].content, aux_append );
+        if( strlen( data[ data_current ].content ) == MAX_CONTENT ) {
+            data[ data_current ].full = 1;
+            data[ data_current ].next_data_block = new_data_block_address();
+            int res = disk_wr( get_data_block_address( data_current ), (uint8_t*) &data[ data_current ], BLOCK_SIZE );
+            data_next = data[ data_current ].next_data_block;
+            data_current = get_data_block_id( data_next );
+            ++file[ fd ].no_of_blocks;
+            res = disk_wr( fd + 1, (uint8_t*) &file[ fd ], BLOCK_SIZE );
+        } else {
+            int res = disk_wr( get_data_block_address( data_current ), (uint8_t*) &data[ data_current ], BLOCK_SIZE );
+        }
+    }
+    return FILE_SUCCESS;
 }
