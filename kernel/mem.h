@@ -14,7 +14,7 @@
 #include "disk.h"
 
 #define NO_OF_BLOCKS 4096
-#define BLOCK_SIZE   256
+#define BLOCK_SIZE   32
 
 #define MAX_FILES 95
 
