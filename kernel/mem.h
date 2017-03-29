@@ -23,8 +23,9 @@
 
 typedef struct file_t {
 	int32_t descriptor;
-	char    name[ 20 ];
+	char    name[ 16 ];
 	int32_t	no_of_blocks;
+	int32_t active;
 	void*   address;
 } file_t;
 
@@ -36,6 +37,7 @@ typedef struct disk_header_t {
 
 void file_setup();
 void file_disk_load();
-int  file_new( char* name );
+int  file_open( char* name );
+int  file_close( int fd );
 
 #endif

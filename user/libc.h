@@ -33,10 +33,11 @@ typedef int pid_t;
 #define SYS_MSEND     ( 0x07 )
 #define SYS_MRECEIVE  ( 0x08 )
 #define SYS_PIPE      ( 0x09 )
-#define SYS_OPEN      ( 0x10 )
-#define SYS_READ      ( 0x11 )
-#define SYS_WRITE     ( 0x12 )
 #define SYS_GETPARENT ( 0x13 )
+#define SYS_OPEN      ( 0x20 )
+#define SYS_CLOSE     ( 0x21 )
+#define SYS_READ      ( 0x22 )
+#define SYS_WRITE     ( 0x23 )
 
 #define SIG_TERM      ( 0x00 )
 #define SIG_QUIT      ( 0x01 )
@@ -92,5 +93,7 @@ extern int  get_pid();
 extern int  get_parent_pid();
 
 extern int  open( char* name );
+
+extern int  close( int fd );
 
 #endif

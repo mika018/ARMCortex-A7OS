@@ -94,6 +94,10 @@ void main_console() {
     else if( 0 == strcmp( p, "open" ) ) {
       char* name = strtok( NULL, " " );
       open( name );
+    }
+    else if( 0 == strcmp( p, "close" ) ) {
+      int fd = atoi( strtok( NULL, " " ) );
+      close( fd );
     } 
     else {
       puts( "unknown command\n", 16 );

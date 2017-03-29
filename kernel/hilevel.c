@@ -5,7 +5,7 @@ void hilevel_handler_rst( ctx_t* ctx              ) {
   
 	scheduler_initialise( ctx );
 	ipc_initialise();
-	file_setup();
+	// file_setup();
 	file_disk_load();
 
 	TIMER0->Timer1Load  = 0x00100000; // select period = 2^20 ticks ~= 1 sec
@@ -101,15 +101,27 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
 			ctx->gpr[ 0 ] = r;
 			break;
 		}
-		case 0x10 : {
+		case 0x13 : { // 0x01 => get_pid_parent()
+			ctx->gpr[ 0 ] = scheduler_get_pid_parent();
+			break;
+		}
+		case 0x20 : { // 0x20 => open( name )
 			char* name = ( char* )( ctx->gpr[ 0 ] );
 
-			int r = file_new( name );
+			int r = file_open( name );
 
 			ctx->gpr[ 0 ] = r;
 			break;
 		}
-		case 0x12 : { // 0x12 => write( fd, x, n )
+		case 0x21 : { // 0x21 => close( fd )
+			int fd = ( int )( ctx->gpr[ 0 ] );
+
+			int r = file_close( fd );
+
+			ctx->gpr[ 0 ] = r;
+			break;
+		}
+		case 0x23 : { // 0x23 => write( fd, x, n )
 			int   fd = ( int   )( ctx->gpr[ 0 ] );
 			char*  x = ( char* )( ctx->gpr[ 1 ] );
 			int    n = ( int   )( ctx->gpr[ 2 ] );
@@ -119,10 +131,6 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
 			}
 
 			ctx->gpr[ 0 ] = n;
-			break;
-		}
-		case 0x13 : { // 0x01 => get_pid_parent()
-			ctx->gpr[ 0 ] = scheduler_get_pid_parent();
 			break;
 		}
 		default   : { // 0x?? => unknown/unsupported

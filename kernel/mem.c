@@ -16,7 +16,7 @@ void file_setup() {
     }
 }
 
-void read_header() {
+void load_header() {
     memset( &header, 0, sizeof( disk_header_t ) );
     int res = disk_rd( 0, (uint8_t*) &header, BLOCK_SIZE );
     if( res == 0 ) {
@@ -26,7 +26,7 @@ void read_header() {
     }
 }
 
-void read_files() {
+void load_files() {
     for( int i = 0; i < MAX_FILES; i++ ) {
         memset( &file[ i ], 0, sizeof( file_t ) );
         int res = disk_rd( i + 1, (uint8_t*) &file[ i ], BLOCK_SIZE );
@@ -35,18 +35,18 @@ void read_files() {
 }
 
 void file_disk_load() {
-    read_header();
-    read_files();
+    load_header();
+    load_files();
 }
 
 //make sure there is space for new file and handle it in file_new
 int new_file_id() {
-    int new_id = ( ( uint32_t ) header.new_file ) - 1; /// BLOCK_SIZE
-    if( new_id < MAX_FILES ) {
-        return new_id;
-    } else {
-        return -1;
+    for( int i = 0; i < MAX_FILES; i++ ) {
+        if( !file[ i ].active ) {
+            return i;
+        }
     }
+    return -1;
 }
 
 void* get_new_data_block_address() {
@@ -60,25 +60,35 @@ void* get_new_data_block_address() {
 // character to ensure valid name if the given name is longer than
 // 20 characters
 void set_file_name( int file_id, char* name ) {
-    strncpy( file[ file_id ].name, name, 19 );
-    file[ file_id ].name[ 19 ] = '\0';
+    strncpy( file[ file_id ].name, name, 15 );
+    file[ file_id ].name[ 15 ] = '\0';
 }
 
-int file_new( char* name ) {
+int file_open( char* name ) {
     int file_id = new_file_id();
     memset( &file[ file_id ], 0, sizeof( file_t ) );
     file[ file_id ].descriptor   = FILE;
     file[ file_id ].no_of_blocks = 0;
     file[ file_id ].address      = get_new_data_block_address();
+    file[ file_id ].active       = 1;
     set_file_name( file_id, name );
     int res = disk_wr( file_id + 1, (uint8_t*) &file[ file_id ], BLOCK_SIZE );
     if( res == 0 ) {
         // print( "New file created!\n", 12 );
-        ++header.new_file;
-        int res = disk_wr( 0, (uint8_t*) &header, BLOCK_SIZE );
+        // ++header.new_file;
+        // int res = disk_wr( 0, (uint8_t*) &header, BLOCK_SIZE );
         return FILE_SUCCESS;
     } else {
         // print( "New file failed!\n", 13 );
+        return FILE_FAILURE;
+    }
+}
+
+int file_close( int fd ) {
+    if( fd <= MAX_FILES ) {
+        file[ fd ].active = 0;
+        return FILE_SUCCESS;
+    } else {
         return FILE_FAILURE;
     }
 }

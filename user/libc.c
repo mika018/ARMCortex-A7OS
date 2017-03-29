@@ -142,10 +142,24 @@ int open( char* name ) {
   int r;
 
   asm volatile( "mov r0, %2 \n" // assign r0 = name
-                "svc %1     \n" // make system call SYS_WRITE
+                "svc %1     \n" // make system call SYS_OPEN
                 "mov %0, r0 \n" // assign r  = r0
               : "=r" (r) 
               : "I" (SYS_OPEN), "r" (name)
+              : "r0" );
+
+  return r;
+
+}
+
+int close( int fd ) {
+  int r;
+
+  asm volatile( "mov r0, %2 \n" // assign r0 = fd
+                "svc %1     \n" // make system call SYS_CLOSE
+                "mov %0, r0 \n" // assign r  = r0
+              : "=r" (r) 
+              : "I" (SYS_CLOSE), "r" (fd)
               : "r0" );
 
   return r;
