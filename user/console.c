@@ -32,6 +32,7 @@ extern void main_P3();
 extern void main_P4(); 
 extern void main_P5(); 
 extern void main_P6(); 
+extern void main_P8();
 
 void* load( char* x ) {
   if     ( 0 == strcmp( x, "P3" ) ) {
@@ -45,6 +46,9 @@ void* load( char* x ) {
   }
   else if( 0 == strcmp( x, "P6" ) ) {
     return &main_P6;
+  }
+  else if( 0 == strcmp( x, "P8" ) ) {
+    return &main_P8;
   }
 
   return NULL;
@@ -104,6 +108,10 @@ void main_console() {
       char* x  = strtok( NULL, " " );
       int   n  = atoi( strtok( NULL, " " ) );
       int res = write( fd, x, n );
+    }
+    else if( 0 == strcmp( p, "cat" ) ) {
+      char* name  = strtok( NULL, " " );
+      cat( name );
     } 
     else {
       puts( "unknown command\n", 16 );

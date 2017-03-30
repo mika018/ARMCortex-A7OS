@@ -65,23 +65,37 @@ void set_file_name( int file_id, char* name ) {
     file[ file_id ].name[ 15 ] = '\0';
 }
 
+int find_file_id( char* name ) {
+    for( int i = 0; i < MAX_FILES; i++ ) {
+        if( file[ i ].active && !strcmp( file[ i ].name, name ) ) {
+            return i;
+        }
+    }
+    return -1;
+}
+
 int file_open( char* name ) {
-    int file_id = new_file_id();
-    memset( &file[ file_id ], 0, sizeof( file_t ) );
-    file[ file_id ].descriptor   = FILE;
-    file[ file_id ].no_of_blocks = 1;
-    file[ file_id ].address      = new_data_block_address();
-    file[ file_id ].active       = 1;
-    set_file_name( file_id, name );
-    int res = disk_wr( file_id + 1, (uint8_t*) &file[ file_id ], BLOCK_SIZE );
-    if( res == 0 ) {
-        // print( "New file created!\n", 12 );
-        // ++header.new_file;
-        // int res = disk_wr( 0, (uint8_t*) &header, BLOCK_SIZE );
-        return FILE_SUCCESS;
+    int find = find_file_id( name );
+    if( find != -1 ) {
+        return find;
     } else {
-        // print( "New file failed!\n", 13 );
-        return FILE_FAILURE;
+        int file_id = new_file_id();
+        memset( &file[ file_id ], 0, sizeof( file_t ) );
+        file[ file_id ].descriptor   = FILE;
+        file[ file_id ].no_of_blocks = 1;
+        file[ file_id ].address      = new_data_block_address();
+        file[ file_id ].active       = 1;
+        set_file_name( file_id, name );
+        int res = disk_wr( file_id + 1, (uint8_t*) &file[ file_id ], BLOCK_SIZE );
+        if( res == 0 ) {
+            // print( "New file created!\n", 12 );
+            // ++header.new_file;
+            // int res = disk_wr( 0, (uint8_t*) &header, BLOCK_SIZE );
+            return file_id;
+        } else {
+            // print( "New file failed!\n", 13 );
+            return FILE_FAILURE;
+        }
     }
 }
 
@@ -142,4 +156,31 @@ int file_write( int fd, void* x, size_t n ) {
         }
     }
     return FILE_SUCCESS;
+}
+
+int file_read( int fd, char* x, size_t n ) {
+    int data_current = get_data_block_id( file[ fd ].address );
+    // memset( x, 0, sizeof( x ) );
+    // strncpy( ( char* ) x, " ", 1 );
+    char output[ n + 1 ];
+    memset( output, 0, sizeof( output ) );
+    size_t n_left = n;
+    void* data_next;
+    while( n_left > 0 ) {
+        if ( n_left > MAX_CONTENT && data[ data_current ].full ) {
+            strncat( output, data[ data_current ].content, MAX_CONTENT );
+            n_left -= strlen( data[ data_current ].content );
+            data_next = data[ data_current ].next_data_block;
+            data_current = get_data_block_id( data_next );
+        } else if( n_left > strlen( data[ data_current ].content ) ) {
+            strncat( output, data[ data_current ].content, strlen( data[ data_current ].content ) );
+            n_left = 0;
+        } else {
+            strncat( output, data[ data_current ].content, n_left );
+            n_left = 0;
+        }
+    }
+    strcpy( x, output );
+    return n - n_left;
+
 }

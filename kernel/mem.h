@@ -49,5 +49,6 @@ void file_disk_load();
 int  file_open( char* name );
 int  file_close( int fd );
 int  file_write( int fd, void* x, size_t n );
+int  file_read( int fd, char* x, size_t n );
 
 #endif
