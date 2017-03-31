@@ -243,11 +243,13 @@ int kill( int pid, int x ) {
   return r;
 }
 
-void cat( char* name ) {
-  asm volatile( "mov r0, %1 \n" // assign r0 =  name
-                "svc %0     \n" // make system call SYS_CAT
-              : 
-              : "I" (SYS_CAT), "r" (name)
-              : "r0" );
-  return;
-}
+// void cat( char* filename, char* result ) {
+//   asm volatile( "mov r0, %1 \n" // assign r0 =  filename
+//                 "mov r1, %2 \n" // assign r1 =  result
+//                 "svc %0     \n" // make system call SYS_CAT
+//               : 
+//               : "I" (SYS_CAT), "r" (filename), "r" (result)
+//               : "r0", "r1" );
+
+//   return;
+// }

@@ -142,9 +142,10 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
 			break;
 		}
 		case 0x30 : { // 0x23 => cat( filename )
-			char*  filename = ( char* )( ctx->gpr[ 0 ] );
+			char* filename = ( char* )( ctx->gpr[ 0 ] );
+			char*   result = ( char* )( ctx->gpr[ 1 ] );
 
-			_cat( filename );
+			_cat( filename, result );
 			
 			break;
 		}

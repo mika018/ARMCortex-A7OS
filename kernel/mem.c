@@ -135,12 +135,12 @@ int file_write( int fd, void* x, size_t n ) {
         char aux_append[ size_left + 1 ];
         memset( aux_append, 0, sizeof(aux_append) );
         if( size_left > n ) {
-            strncpy( aux_append, input, size_left );
+            strncpy( aux_append, input, n );
             n = 0;
         } else {
             strncpy( aux_append, input, size_left );
-            n     = n     - size_left;
-            input = input + size_left;
+            n     -= size_left;
+            input += size_left;
         }
         strcat( data[ data_current ].content, aux_append );
         if( strlen( data[ data_current ].content ) == MAX_CONTENT ) {
@@ -163,7 +163,8 @@ int file_read( int fd, char* x, size_t n ) {
     // memset( x, 0, sizeof( x ) );
     // strncpy( ( char* ) x, " ", 1 );
     char output[ n + 1 ];
-    memset( output, 0, sizeof( output ) );
+    output[0] = '\0';
+    // memset( output, 0, sizeof( output ) );
     size_t n_left = n;
     void* data_next;
     while( n_left > 0 ) {

@@ -9,6 +9,6 @@
 
 #include "libc.h"
 
-void _cat( char* filename );
+void _cat( char* filename, char* result );
 
 #endif

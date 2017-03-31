@@ -7,6 +7,6 @@ void main_P8() {
 	char* res = "";
 	int rd = read( fd, res, 11 );
 	int rdi = read( fd, res, 99999 );
-	int wri = write( fd, "BRAVOOOOOOO0000000000000", 24 );
+	int wri = write( fd, "BRAVOOOOOOOBRATKEMOJJEDINI", 26 );
 	exit( EXIT_SUCCESS );
 }

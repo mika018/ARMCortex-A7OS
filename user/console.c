@@ -34,6 +34,15 @@ extern void main_P5();
 extern void main_P6(); 
 extern void main_P8();
 
+void cat( char* filename ) {
+	int fd = open( filename );
+  char result[5000];
+	memset( result, 0, sizeof( result ) );
+	int rd = read( fd, result, sizeof( result ) );
+  puts( result, strlen( result ) );
+  puts( "\n", 1 );
+}
+
 void* load( char* x ) {
   if     ( 0 == strcmp( x, "P3" ) ) {
     return &main_P3;
@@ -110,8 +119,8 @@ void main_console() {
       int res = write( fd, x, n );
     }
     else if( 0 == strcmp( p, "cat" ) ) {
-      char* name  = strtok( NULL, " " );
-      cat( name );
+      char* filename  = strtok( NULL, " " );
+      cat( filename);
     } 
     else {
       puts( "unknown command\n", 16 );

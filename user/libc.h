@@ -98,6 +98,6 @@ extern int  open( char* name );
 extern int  close( int fd );
 
 
-extern void cat( char* name );
+// extern void cat( char* filename, char* result );
 
 #endif
