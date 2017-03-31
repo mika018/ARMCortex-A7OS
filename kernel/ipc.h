@@ -30,7 +30,7 @@ typedef struct pipe_t {
 
 void ipc_initialise();
 int  ipc_pipe( pid_t pid_1, pid_t pid_2 );
-void ipc_send_message( int pipe_id, pid_t pid_src, pid_t pid_des, int sig );
+int  ipc_send_message( int pipe_id, pid_t pid_src, pid_t pid_des, int sig );
 int  ipc_receive_message( int pipe_id, pid_t pid_des );
 
 #endif

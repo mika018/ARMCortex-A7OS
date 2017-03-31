@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <string.h>
 
 // Define a type that that captures a Process IDentifier (PID).
 
@@ -49,6 +50,10 @@ typedef int pid_t;
 #define FILE_SUCCESS  ( 0 )
 #define FILE_FAILURE  ( 1 )
 
+#define IPC_EMPTY     (-1 )
+#define IPC_SUCCESS   ( 1 )
+#define IPC_FAILURE   ( 0 )
+
 #define  STDIN_FILENO ( 0 )
 #define STDOUT_FILENO ( 1 )
 #define STDERR_FILENO ( 2 )
@@ -71,11 +76,11 @@ extern int  read( int fd,       void* x, size_t n );
 // initialises the pipe between two processes
 extern int  make_pipe( int pid_1, int pid_2 );
 // sends a signal x from process with id pid_from to process with id pid_to
-extern void msend( int pipe_id, int pid_src, int pid_des, int x );
+extern int  msend( int pipe_id, int pid_src, int pid_des, int x );
 // returns a signal sent to process with id pid_des
 extern int  mreceive( int pipe_id, int pid_des );
 
-// prints x to the console
+// prints x to the qemu
 extern void print( const void* x, size_t n );
 
 // perform fork, returning 0 iff. child or > 0 iff. parent process

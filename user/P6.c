@@ -7,11 +7,11 @@ int  chopstick[NO_OF_PHILOSOPHERS];
 int   child_id[NO_OF_PHILOSOPHERS];
 pid_t pid_parent;
 
-int index = 0;
+int first_index = 0;
 
-int update_index() {
-	index++;
-	return index % NO_OF_PHILOSOPHERS;
+int update_first_index() {
+	first_index++;
+	return first_index % NO_OF_PHILOSOPHERS;
 }
 
 void initialise() {
@@ -24,7 +24,7 @@ void initialise() {
 		} else {
 			child_id[ i ] = res;
 			child_pipe[ i ] = make_pipe( pid_parent, child_id[ i ] );
-			msend( child_pipe[ i ], pid_parent, child_id[ i ], INIT );
+			int r = msend( child_pipe[ i ], pid_parent, child_id[ i ], INIT );
 		}
 	}
 	yield();
@@ -52,16 +52,16 @@ void chopsticks_return() {
 void main_P6() {
 	initialise();
 	while( 1 ) { 
-		for( int i = index; i < NO_OF_PHILOSOPHERS + index; i++ ) {
+		for( int i = first_index; i < NO_OF_PHILOSOPHERS + first_index; i++ ) {
 			int id = i % NO_OF_PHILOSOPHERS;
 			if( chopsticks_available( id ) ) {
-				msend( child_pipe[ id ], pid_parent, child_id[ id ], EAT );
+				int r = msend( child_pipe[ id ], pid_parent, child_id[ id ], EAT );
 				chopsticks_remove( id );
 			} else {
-                msend( child_pipe[ id ], pid_parent, child_id[ id ], THINK );
+                int r = msend( child_pipe[ id ], pid_parent, child_id[ id ], THINK );
 			}
 		}
-		index = update_index();
+		first_index = update_first_index();
 		chopsticks_return();
         print( "Waiter       : SWITCH BOYS\n", 27);
         yield();

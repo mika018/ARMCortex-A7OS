@@ -89,15 +89,20 @@ int make_pipe( int pid_1, int pid_2 ) {
   return r;
 }
 
-void msend( int pipe_id, int pid_src, int pid_des, int x ) {
-  asm volatile( "mov r0, %1 \n" // assign r0 = pipe_id
-                "mov r1, %2 \n" // assign r1 = pid_src
-                "mov r2, %3 \n" // assign r2 = pid_des
-                "mov r3, %4 \n" // assign r3 =       x
-                "svc %0     \n" // make system call SYS_MSEND
-              :  
+int msend( int pipe_id, int pid_src, int pid_des, int x ) {
+  int r;
+
+  asm volatile( "mov r0, %2 \n" // assign r0 = pipe_id
+                "mov r1, %3 \n" // assign r1 = pid_src
+                "mov r2, %4 \n" // assign r2 = pid_des
+                "mov r3, %5 \n" // assign r3 =       x
+                "svc %1     \n" // make system call SYS_MSEND
+                "mov %0, r0 \n" // assign r  =      r0
+              : "=r" (r)
               : "I" (SYS_MSEND), "r" (pipe_id), "r" (pid_src), "r" (pid_des), "r" (x) 
               : "r0", "r1", "r2", "r3" );
+  
+  return r;
 }
 
 int mreceive( int pipe_id, int pid_des ) {

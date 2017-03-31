@@ -68,9 +68,9 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
 			pid_t pid = ( pid_t )( ctx->gpr[ 0 ] );
 			int   sig = ( int   )( ctx->gpr[ 1 ] );
 
-			int result = scheduler_kill( pid, sig );
+			int r = scheduler_kill( pid, sig );
 
-			ctx->gpr[ 0 ] = result;
+			ctx->gpr[ 0 ] = r;
 			break;
 		}
 		case 0x07 : { // 0x07 => msend( pipe_id, pid_src, pid_des, x)
@@ -79,8 +79,9 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
 			pid_t pid_des = ( pid_t )( ctx->gpr[ 2 ] );
 			int         x = ( int   )( ctx->gpr[ 3 ] );
 			
-			ipc_send_message( pipe_id, pid_src, pid_des, x );
+			int r = ipc_send_message( pipe_id, pid_src, pid_des, x );
 
+			ctx->gpr[ 0 ] = r;
 			break;
 		}
 		case 0x08 : { // 0x08 => mreceive( pipe_id, pid_des )

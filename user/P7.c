@@ -1,4 +1,4 @@
-#include "P7.h"
+#include "P6.h"
 
 int buffer;
 
@@ -10,31 +10,26 @@ void main_P7() {
 	while( 1 ) { // Child process
 		itoa( id, pid_child );
 		buffer = mreceive( pipe, pid_child );
+		print( "Philosopher ", 12 );
+		print( id, strlen( id ) );
 		switch( buffer ) {
 			case INIT: {
-				print( "Philosopher ", 12 );
-				print( id, 1 );
 				print( ": READY\n", 8 );
 				break;
 			}
 			case EAT: {
-				print( "Philosopher ", 12 );
-				print( id, 1 );
 				print( ": EATING\n", 9 );
 				break;
 			}
 			case THINK: {
-				print( "Philosopher ", 12 );
-				print( id, 1 );
 				print( ": THINKING\n", 11 );
 				break;
 			}
-			case EMPTY: {
+			case IPC_EMPTY: {
+				print( ": WAITING FOR COMMAND\n", 22 );
 				break;
 			}
 			default: {
-				print( "Philosopher ", 12 );
-				print( id, 1 );
 				print( ": UNSUPPORTED SIGNAL\n", 21 );
 				break;
 			}

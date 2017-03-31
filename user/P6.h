@@ -8,7 +8,7 @@
 #include "PL011.h"
 #include "libc.h"
 
-#define NO_OF_PHILOSOPHERS 6
+#define NO_OF_PHILOSOPHERS 16
 
 #define INIT 2
 #define EAT 3
