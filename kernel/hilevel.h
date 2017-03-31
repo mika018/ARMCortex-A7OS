@@ -12,7 +12,6 @@
 #include       "int.h"
 #include       "ipc.h"
 #include       "mem.h"
-#include       "cat.h"
 #include   "lolevel.h"
 #include "scheduler.h"
 

@@ -1,25 +1,11 @@
 #ifndef __SCHEDULER_H
 #define __SCHEDULER_H
 
-// Include functionality relating to newlib (the standard C library).
+#include "libc.h"
 
-// #include <stdlib.h>
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
-#include <string.h>
+#define TABLE_SIZE    30
+#define FORK_PRIORITY 4194304
 
-/* The kernel source code is made simpler via three type definitions:
- *
- * - a type that captures a Process IDentifier (PID), which is really
- *   just an integer,
- * - a type that captures each component of an execution context (i.e.,
- *   processor state) in a compatible order wrt. the low-level handler
- *   preservation and restoration prologue and epilogue, and
- * - a type that captures a process PCB.
- */
-#define TABLE_SIZE  30
-#define UINT_32_MAX 4294967
 typedef int pid_t;
 
 typedef struct {
@@ -35,18 +21,23 @@ typedef struct pcb_t {
   uint32_t priority_curr;
 } pcb_t;
 
+// initialises the pcb table by loading the console.
 void  scheduler_initialise( ctx_t* ctx );
+// performs a context switch between two running processes
 void  scheduler_run( ctx_t* ctx );
+
+// creates a new child process identical to the parent process
 pid_t scheduler_fork( ctx_t* ctx );
+// replaces a current process image with a new one
 void  scheduler_exec( ctx_t* ctx );
+// causes a process to terminate, removing it from the pcb table
 void  scheduler_exit( ctx_t* ctx );
+// forces a process to terminate, removing it from the pcb table
 int   scheduler_kill( pid_t pid, int sig );
+
+// returns the pid of currently tunning process
 pid_t scheduler_get_pid();
+// returns the parent pid of currently tunning process
 pid_t scheduler_get_pid_parent();
 
-/*
-typedef struct {
-  pcb_t* head;
-} pcb_table;
-*/
 #endif

@@ -21,6 +21,8 @@ void initialise() {
 		int res = fork();
 		if( res == 0 ) {  
 			exec( &main_P7, 2 );
+		} else if( res == -1 ) { // maximum processes running
+			continue;
 		} else {
 			child_id[ i ] = res;
 			child_pipe[ i ] = make_pipe( pid_parent, child_id[ i ] );
@@ -63,7 +65,7 @@ void main_P6() {
 		}
 		first_index = update_first_index();
 		chopsticks_return();
-        print( "Waiter       : SWITCH BOYS\n", 27);
+        print( UART0, "Waiter       : SWITCH BOYS\n", 27);
         yield();
 	}
 	exit( EXIT_SUCCESS );

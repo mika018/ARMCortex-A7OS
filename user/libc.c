@@ -1,5 +1,6 @@
 #include "libc.h"
 
+// convert ASCII string x into integer r
 int  atoi( char* x        ) {
   char* p = x; bool s = false; int r = 0;
 
@@ -18,6 +19,7 @@ int  atoi( char* x        ) {
   return r;
 }
 
+// convert integer x into ASCII string r
 void itoa( char* r, int x ) {
   char* p = r; int t, n;
 
@@ -45,6 +47,8 @@ void itoa( char* r, int x ) {
   return;
 }
 
+// fills memory pointed to by s with a constant byte c of size count.
+// similar in design to MEMSET(3).
 void* memset( void *s, int c, size_t count ) {
   char *xs = s;
   
@@ -55,6 +59,7 @@ void* memset( void *s, int c, size_t count ) {
   return s;
 }
 
+// cooperatively yield control of processor, i.e., invoke the scheduler
 void yield() {
   asm volatile( "svc %0     \n" // make system call SYS_YIELD
               :
@@ -64,17 +69,14 @@ void yield() {
   return;
 }
 
-void print( const void* x, size_t n ) {
-  asm volatile( "mov r0, %1 \n" // assign r0 =  x
-                "mov r1, %2 \n" // assign r1 =  n
-                "svc %0     \n" // make system call SYS_PRINT
-              : 
-              : "I" (SYS_PRINT), "r" (x), "r" (n)
-              : "r0", "r1" );
-
-  return;
+// prints x of size n to d
+void print( PL011_t* d, char* x, size_t n ) {
+  for( int i = 0; i < n; i++ ) {
+    PL011_putc( d, x[ i ], true );
+  }
 }
 
+// initialises the pipe between two processes
 int make_pipe( int pid_1, int pid_2 ) {
   int r;
 
@@ -89,6 +91,7 @@ int make_pipe( int pid_1, int pid_2 ) {
   return r;
 }
 
+// sends a signal x from process pid_from to process pid_to along pipe pipe_id
 int msend( int pipe_id, int pid_src, int pid_des, int x ) {
   int r;
 
@@ -105,6 +108,7 @@ int msend( int pipe_id, int pid_src, int pid_des, int x ) {
   return r;
 }
 
+// returns a signal sent to process pid_des on pipe pipe_id
 int mreceive( int pipe_id, int pid_des ) {
   int r;
 
@@ -119,6 +123,7 @@ int mreceive( int pipe_id, int pid_des ) {
   return r;
 }
 
+// returns a pid of a currently running process
 int get_pid() {
   int r;
 
@@ -131,6 +136,7 @@ int get_pid() {
   return r;
 }
 
+// returns a parent pid of a currently running process
 int get_parent_pid() {
   int r;
 
@@ -143,6 +149,7 @@ int get_parent_pid() {
   return r;
 }
 
+// opens a file and loads it onto the available address in disk.bin
 int open( char* name ) {
   int r;
 
@@ -157,6 +164,7 @@ int open( char* name ) {
 
 }
 
+// closes a file by removing it from disk.bin
 int close( int fd ) {
   int r;
 
@@ -171,6 +179,7 @@ int close( int fd ) {
 
 }
 
+// write n bytes from x to   the file descriptor fd; return bytes written
 int write( int fd, const void* x, size_t n ) {
   int r;
 
@@ -186,6 +195,7 @@ int write( int fd, const void* x, size_t n ) {
   return r;
 }
 
+// read  n bytes into x from the file descriptor fd; return bytes read
 int  read( int fd,       void* x, size_t n ) {
   int r;
 
@@ -201,6 +211,7 @@ int  read( int fd,       void* x, size_t n ) {
   return r;
 }
 
+// perform fork, returning 0 iff. child or > 0 iff. parent process
 int fork() {
   int r;
 
@@ -213,6 +224,7 @@ int fork() {
   return r;
 }
 
+// perform exit, i.e., terminate process with status x
 void exit( int x ) {
   asm volatile( "mov r0, %1 \n" // assign r0 =  x
                 "svc %0     \n" // make system call SYS_EXIT
@@ -223,6 +235,7 @@ void exit( int x ) {
   return;
 }
 
+// perform exec, i.e., start executing program at address x with priotity p
 void exec( const void* x, int p ) {
   asm volatile( "mov r0, %1 \n" // assign r0 = x
                 "mov r1, %2 \n" // assign r1 = p
@@ -234,6 +247,7 @@ void exec( const void* x, int p ) {
   return;
 }
 
+// signal process identified by pid with signal x
 int kill( int pid, int x ) {
   int r;
 
@@ -248,13 +262,3 @@ int kill( int pid, int x ) {
   return r;
 }
 
-// void cat( char* filename, char* result ) {
-//   asm volatile( "mov r0, %1 \n" // assign r0 =  filename
-//                 "mov r1, %2 \n" // assign r1 =  result
-//                 "svc %0     \n" // make system call SYS_CAT
-//               : 
-//               : "I" (SYS_CAT), "r" (filename), "r" (result)
-//               : "r0", "r1" );
-
-//   return;
-// }

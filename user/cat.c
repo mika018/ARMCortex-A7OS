@@ -1,8 +1,9 @@
 #include "cat.h"
 
-void _cat( char* filename, char* result ) {
+void cat( char* filename ) {
 	int fd = open( filename );
-	memset( result, 0, sizeof( result ) );
-	int rd = read( fd, result, sizeof( result ) );
-	//exit( EXIT_SUCCESS );
+  	char* result = "";
+	int rd = read( fd, result, CAT_MAX );
+	print( UART1, result, strlen( result ) );
+	print( UART1, "\n", 1 );
 }

@@ -16,7 +16,7 @@ int is_prime( uint32_t x ) {
 
 void main_P3() {
   for( int i = 0; i < 15; i++ ) {
-    print( "P3", 2 );
+    print( UART0, "P3", 2 );
 
     uint32_t lo = 1 <<  8;
     uint32_t hi = 1 << 16;

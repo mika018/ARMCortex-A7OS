@@ -14,7 +14,7 @@ uint32_t gcd( uint32_t x, uint32_t y ) {
 
 void main_P4() {
   while( 1 ) {
-    print( "P4", 2 );
+    print( UART0, "P4", 2 );
 
     uint32_t lo = 1 <<  4;
     uint32_t hi = 1 <<  8;

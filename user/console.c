@@ -1,17 +1,6 @@
 #include "console.h"
 
-/* The following functions are special-case versions of a) writing,
- * and b) reading a string from the UART (the latter case returning 
- * once a carriage return character has been read, or an overall
- * limit reached).
- */
-
-void puts( char* x, int n ) {
-  for( int i = 0; i < n; i++ ) {
-    PL011_putc( UART1, x[ i ], true );
-  }
-}
-
+// reads the string from the UART
 void gets( char* x, int n ) {
   for( int i = 0; i < n; i++ ) {
     x[ i ] = PL011_getc( UART1, true );
@@ -34,14 +23,6 @@ extern void main_P5();
 extern void main_P6(); 
 extern void main_P8();
 
-void cat( char* filename ) {
-	int fd = open( filename );
-  char result[5000];
-	memset( result, 0, sizeof( result ) );
-	int rd = read( fd, result, sizeof( result ) );
-  puts( result, strlen( result ) );
-  puts( "\n", 1 );
-}
 
 void* load( char* x ) {
   if     ( 0 == strcmp( x, "P3" ) ) {
@@ -67,7 +48,7 @@ void* load( char* x ) {
  * (infinite) loop over three main steps, namely
  *
  * 1. write a command prompt then read a command,
- * 2. split the command into space-separated tokens using strtok,
+ * 2. split the command into tokens using strtok,
  * 3. execute whatever steps the command dictates.
  */
 
@@ -75,14 +56,12 @@ void main_console() {
   char* p, x[ 1024 ];
 
   while( 1 ) {
-    // let it print C here
-    puts( "shell$ ", 7 ); gets( x, 1024 ); p = strtok( x, " " );
+    print( UART1, "shell$ ", 7 ); gets( x, 1024 ); p = strtok( x, " " );
 
     if     ( 0 == strcmp( p, "fork" ) ) {
       pid_t pid = fork();
-
       if( 0 == pid ) {
-        void* addr   = load( strtok( NULL, " " ) );
+        void* addr = load( strtok( NULL, " " ) );
         char* priority_char = strtok( NULL, " ");
         int priority;
         // If priority not entered set it to the default value (2)
@@ -97,6 +76,7 @@ void main_console() {
     else if( 0 == strcmp( p, "kill" ) ) {
       char* pid_char = strtok( NULL, " " );
       int   s   = atoi( strtok( NULL, " " ) );
+      
       if( 0 == strcmp( pid_char, "all" ) ) {
         kill( -1, s );
       } else {
@@ -105,25 +85,35 @@ void main_console() {
       }
     } 
     else if( 0 == strcmp( p, "open" ) ) {
-      char* name = strtok( NULL, " " );
+      char* name = strtok( NULL, "\0" );
       int res = open( name );
+
+      char result[2];
+      result[0] = '\0';
+      itoa( result, res );
+
+      print( UART1, result, strlen( result ) );
+      print( UART1, "\n", 1 );
     }
     else if( 0 == strcmp( p, "close" ) ) {
-      int fd = atoi( strtok( NULL, " " ) );
-      int res = close( fd );
+      int fd = atoi( strtok( NULL, "\0" ) );
+      
+      close( fd );
     } 
     else if( 0 == strcmp( p, "write" ) ) {
       int   fd = atoi( strtok( NULL, " " ) );
-      char* x  = strtok( NULL, " " );
-      int   n  = atoi( strtok( NULL, " " ) );
-      int res = write( fd, x, n );
+      char* x  = strtok( NULL, "\0" );
+      int   n  = strlen( x );
+      
+      write( fd, x, n );
     }
     else if( 0 == strcmp( p, "cat" ) ) {
       char* filename  = strtok( NULL, " " );
+      
       cat( filename);
     } 
     else {
-      puts( "unknown command\n", 16 );
+      print( UART1, "unknown command\n", 16 );
     }
   }
 

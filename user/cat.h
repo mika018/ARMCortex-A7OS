@@ -1,14 +1,11 @@
 #ifndef __CAT_H
 #define __CAT_H
 
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
-#include <string.h>
-// #include <limits.h>
+#include  "libc.h"
+#include "PL011.h"
 
-#include "libc.h"
+#define CAT_MAX 5000
 
-void _cat( char* filename, char* result );
+void cat( char* filename );
 
 #endif

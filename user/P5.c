@@ -12,7 +12,7 @@ uint32_t weight( uint32_t x ) {
 
 void main_P5() {
   while( 1 ) {
-    print( "P5", 2 );
+    print( UART0, "P5", 2 );
 
     uint32_t lo = 1 <<  8;
     uint32_t hi = 1 << 24;

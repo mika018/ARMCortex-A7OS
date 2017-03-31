@@ -56,12 +56,12 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
 			break;
 		}
 		case 0x05 : { // 0x05 => print( x, n )
-			char*  x = ( char* )( ctx->gpr[ 0 ] );
-			int    n = ( int   )( ctx->gpr[ 1 ] );
+			// char*  x = ( char* )( ctx->gpr[ 0 ] );
+			// int    n = ( int   )( ctx->gpr[ 1 ] );
 
-			for( int i = 0; i < n; i++ ) {
-				PL011_putc( UART0, *x++, true );
-			}
+			// for( int i = 0; i < n; i++ ) {
+			// 	PL011_putc( UART0, *x++, true );
+			// }
 			break;
 		}
 		case 0x06 : { // 0x06 => kill
@@ -143,10 +143,10 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
 			break;
 		}
 		case 0x30 : { // 0x23 => cat( filename )
-			char* filename = ( char* )( ctx->gpr[ 0 ] );
-			char*   result = ( char* )( ctx->gpr[ 1 ] );
+			// char* filename = ( char* )( ctx->gpr[ 0 ] );
+			// char*   result = ( char* )( ctx->gpr[ 1 ] );
 
-			_cat( filename, result );
+			// _cat( filename, result );
 			
 			break;
 		}

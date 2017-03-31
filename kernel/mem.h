@@ -7,7 +7,7 @@
 // #include <stdbool.h>
 // #include <stddef.h>
 // #include <stdint.h>
-#include <string.h>
+// #include <string.h>
 // #include <limits.h>
 
 #include "libc.h"
@@ -33,9 +33,8 @@ typedef struct file_t {
 } file_t;
 
 typedef struct disk_header_t {
-	void* new_file;
 	void* new_data_block;
-	char  holder[ 24 ];
+	char  holder[ 28 ];
 } disk_header_t;
 
 typedef struct data_t {
@@ -44,8 +43,10 @@ typedef struct data_t {
 	void*   next_data_block;
 } data_t;
 
+// Initialises the header ( used only on a new disk )
 void file_setup();
 void file_disk_load();
+// opens a file and loads it onto the available address in disk.bin
 int  file_open( char* name );
 int  file_close( int fd );
 int  file_write( int fd, void* x, size_t n );
